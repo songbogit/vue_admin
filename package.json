@@ -22,6 +22,7 @@
     "iview": "^3.1.4",
     "iview-area": "^1.5.17",
     "js-cookie": "^2.2.0",
+    "qs": "^6.6.0",
     "simplemde": "^1.11.2",
     "sortablejs": "^1.7.0",
     "vue": "^2.5.10",
@@ -51,18 +52,5 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ],
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.js": [
-      "vue-cli-service lint",
-      "git add"
-    ],
-    "*.vue": [
-      "vue-cli-service lint",
-      "git add"
-    ]
-  }
+  ]
 }

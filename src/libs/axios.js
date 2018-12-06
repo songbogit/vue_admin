@@ -1,65 +1,136 @@
 import axios from 'axios'
-import store from '@/store'
-// import { Spin } from 'iview'
-const addErrorLog = errorInfo => {
-  const { statusText, status, request: { responseURL } } = errorInfo
-  let info = {
-    type: 'ajax',
-    code: status,
-    mes: statusText,
-    url: responseURL
+import {Message} from 'iview'
+import Cookies from 'js-cookie'
+import {stringify} from 'qs'
+
+// 统一请求路径前缀
+// let base = process.env.NODE_ENV === 'production' ? config.baseUrl.pro : config.baseUrl.dev;
+const base = '/api'
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'// 配置post请求头类型
+// 超时设定
+axios.defaults.timeout = 15000
+
+axios.interceptors.request.use(config => {
+  let accessToken = getStore('accessToken')
+  if (config.method === 'post') {
+    config.data = stringify(config.data)
   }
-  if (!responseURL.includes('save_error_logger')) store.dispatch('addErrorLog', info)
+  return config
+}, err => {
+  Message.error('请求超时')
+  return Promise.resolve(err)
+})
+
+// http response 拦截器
+axios.interceptors.response.use(response => {
+  const data = response.data
+
+  // 根据返回的code值来做不同的处理(和后端约定)
+
+  if (data) {
+    switch (data.code) {
+      case 401:
+        Message.error(data.message)
+        // 未登录 清除已登录状态
+        Cookies.set('userInfo', '')
+        router.push('/login')
+        break
+      case 403:
+        // 没有权限
+        if (data.message !== null) {
+          Message.error(data.message)
+        } else {
+          Message.error('未知错误')
+        }
+        break
+      case 500:
+        // 错误
+        if (data.message !== null) {
+          Message.error(data.message)
+        } else {
+          Message.error('未知错误')
+        }
+        break
+      default:
+        return data
+    }
+  }
+  return data
+}, (err) => {
+  // 返回状态码不为200时候的错误处理
+  Message.error(err.toString())
+  return Promise.resolve(err)
+})
+
+export const getRequest = (url, params) => {
+  let accessToken = getStore('accessToken')
+  return axios({
+    method: 'get',
+    url: `${base}${url}`,
+    params: params,
+    headers: {
+      'accessToken': accessToken
+    }
+  })
 }
 
-class HttpRequest {
-  constructor (baseUrl = baseURL) {
-    this.baseUrl = baseUrl
-    this.queue = {}
-  }
-  getInsideConfig () {
-    const config = {
-      baseURL: this.baseUrl,
-      headers: {
-        //
-      }
-    }
-    return config
-  }
-  destroy (url) {
-    delete this.queue[url]
-    if (!Object.keys(this.queue).length) {
-      // Spin.hide()
-    }
-  }
-  interceptors (instance, url) {
-    // 请求拦截
-    instance.interceptors.request.use(config => {
-      // 添加全局的loading...
-      if (!Object.keys(this.queue).length) {
-        // Spin.show() // 不建议开启，因为界面不友好
-      }
-      this.queue[url] = true
-      return config
-    }, error => {
-      return Promise.reject(error)
-    })
-    // 响应拦截
-    instance.interceptors.response.use(res => {
-      this.destroy(url)
-      const { data, status } = res
-      return { data, status }
-    }, error => {
-      this.destroy(url)
-      addErrorLog(error.response)
-      return Promise.reject(error)
-    })
-  }
-  request (options) {
-    const instance = axios.create()
-    options = Object.assign(this.getInsideConfig(), options)
-    this.interceptors(instance, options.url)
-    return instance(options)
-  }
+export const postRequest = (url, params) => {
+  let accessToken = getStore('accessToken')
+  return axios({
+    method: 'post',
+    url: `${base}${url}`,
+    data: params
+  })
 }
-export default HttpRequest
+
+export const putRequest = (url, params) => {
+  let accessToken = getStore('accessToken')
+  return axios({
+    method: 'put',
+    url: `${base}${url}`,
+    data: params,
+    transformRequest: [function (data) {
+      let ret = ''
+      for (let it in data) {
+        ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+      }
+      return ret
+    }],
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'accessToken': accessToken
+    }
+  })
+}
+
+export const deleteRequest = (url, params) => {
+  let accessToken = getStore('accessToken')
+  return axios({
+    method: 'delete',
+    url: `${base}${url}`,
+    params: params,
+    headers: {
+      'accessToken': accessToken
+    }
+  })
+}
+
+export const uploadFileRequest = (url, params) => {
+  let accessToken = getStore('accessToken')
+  return axios({
+    method: 'post',
+    url: `${base}${url}`,
+    params: params,
+    headers: {
+      'accessToken': accessToken
+    }
+  })
+}
+
+export default {
+  getRequest,
+  postRequest,
+  putRequest,
+  deleteRequest,
+  uploadFileRequest
+}
