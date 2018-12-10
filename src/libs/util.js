@@ -3,15 +3,15 @@ import Cookies from 'js-cookie'
 import config from '@/config'
 import { forEach, hasOneOf, objEqual } from '@/libs/tools'
 
-export const TOKEN_KEY = 'token'
+export const TOKEN_KEY = 'userInfo'
 
-export const setToken = (token) => {
-  Cookies.set(TOKEN_KEY, token, {expires: config.cookieExpires || 1})
+export const setUserInfo = (token) => {
+  Cookies.set(TOKEN_KEY, token, {expires: 1})
 }
 
-export const getToken = () => {
+export const getUserInfo = () => {
   const token = Cookies.get(TOKEN_KEY)
-  if (token) return token
+  if (token) return JSON.parse(token)
   else return false
 }
 

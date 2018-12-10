@@ -17,20 +17,23 @@
 
 <script>
 import LoginForm from '_c/login-form'
-import { mapActions } from 'vuex'
+import { login } from "../../api/user"
+import Cookie from 'js-cookie'
+
 export default {
   components: {
     LoginForm
   },
   methods: {
-    ...mapActions([
-      'handleLogin',
-      'getUserInfo'
-    ]),
     handleSubmit ({ userName, password }) {
-      // this.$router.go(-1)
-      alert('adsfad')
-      this.$router.push('/home')
+      login({
+        username: userName,
+        password: password
+      }).then(res => {
+        console.log(res)
+      }).catch(res => {
+
+      })
     }
   }
 }

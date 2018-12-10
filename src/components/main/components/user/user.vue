@@ -12,7 +12,8 @@
 
 <script>
 import './user.less'
-import { mapActions } from 'vuex'
+import { setUserInfo } from "../../../../libs/util";
+
 export default {
   name: 'User',
   props: {
@@ -22,17 +23,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions([
-      'handleLogOut'
-    ]),
     handleClick (name) {
       switch (name) {
         case 'logout':
-          this.handleLogOut().then(() => {
-            this.$router.push({
-              name: 'login'
-            })
-          })
+          setUserInfo('');
+          window.location.reload();
           break
       }
     }

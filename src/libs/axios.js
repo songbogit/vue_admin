@@ -2,6 +2,7 @@ import axios from 'axios'
 import {Message} from 'iview'
 import Cookies from 'js-cookie'
 import {stringify} from 'qs'
+import router from './../router';
 
 // 统一请求路径前缀
 // let base = process.env.NODE_ENV === 'production' ? config.baseUrl.pro : config.baseUrl.dev;
@@ -11,7 +12,6 @@ axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded
 axios.defaults.timeout = 15000
 
 axios.interceptors.request.use(config => {
-  let accessToken = getStore('accessToken')
   if (config.method === 'post') {
     config.data = stringify(config.data)
   }
@@ -63,7 +63,6 @@ axios.interceptors.response.use(response => {
 })
 
 export const getRequest = (url, params) => {
-  let accessToken = getStore('accessToken')
   return axios({
     method: 'get',
     url: `${base}${url}`,
@@ -75,7 +74,6 @@ export const getRequest = (url, params) => {
 }
 
 export const postRequest = (url, params) => {
-  let accessToken = getStore('accessToken')
   return axios({
     method: 'post',
     url: `${base}${url}`,
@@ -83,54 +81,7 @@ export const postRequest = (url, params) => {
   })
 }
 
-export const putRequest = (url, params) => {
-  let accessToken = getStore('accessToken')
-  return axios({
-    method: 'put',
-    url: `${base}${url}`,
-    data: params,
-    transformRequest: [function (data) {
-      let ret = ''
-      for (let it in data) {
-        ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
-      }
-      return ret
-    }],
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'accessToken': accessToken
-    }
-  })
-}
-
-export const deleteRequest = (url, params) => {
-  let accessToken = getStore('accessToken')
-  return axios({
-    method: 'delete',
-    url: `${base}${url}`,
-    params: params,
-    headers: {
-      'accessToken': accessToken
-    }
-  })
-}
-
-export const uploadFileRequest = (url, params) => {
-  let accessToken = getStore('accessToken')
-  return axios({
-    method: 'post',
-    url: `${base}${url}`,
-    params: params,
-    headers: {
-      'accessToken': accessToken
-    }
-  })
-}
-
 export default {
   getRequest,
   postRequest,
-  putRequest,
-  deleteRequest,
-  uploadFileRequest
 }

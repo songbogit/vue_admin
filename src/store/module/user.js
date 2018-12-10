@@ -1,12 +1,12 @@
 import { login, logout, getUserInfo } from '@/api/user'
-import { setToken, getToken } from '@/libs/util'
+import { setUserInfo, getUserInfo as getUser } from '@/libs/util'
 
 export default {
   state: {
     userName: '',
     userId: '',
     avatorImgPath: '',
-    token: getToken(),
+    userInfo: getUser(),
     access: '',
     hasGetInfo: false
   },
@@ -23,9 +23,9 @@ export default {
     setAccess (state, access) {
       state.access = access
     },
-    setToken (state, token) {
-      state.token = token
-      setToken(token)
+    setUser (state, userInfo) {
+      state.userInfo = userInfo
+      setUserInfo(userInfo)
     },
     setHasGetInfo (state, status) {
       state.hasGetInfo = status
@@ -52,7 +52,7 @@ export default {
     handleLogOut ({ state, commit }) {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
-          commit('setToken', '')
+          commit('setUser', '')
           commit('setAccess', [])
           resolve()
         }).catch(err => {

@@ -49,7 +49,10 @@ module.exports = {
       '/api': {
         target: 'http://39.105.158.93:8800',
         changeOrigin: true,
-        ws: true
+        ws: true,
+        pathRewrite: {
+          '^/api': ''
+        }
       }
     }
   }
