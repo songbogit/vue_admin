@@ -16,9 +16,9 @@
 </template>
 
 <script>
-import LoginForm from '_c/login-form'
-import { login } from "../../api/user"
-import Cookie from 'js-cookie'
+import LoginForm from '_c/login-form';
+import { login } from "../../api/user";
+import { setUserInfo } from "../../libs/util";
 
 export default {
   components: {
@@ -30,7 +30,10 @@ export default {
         username: userName,
         password: password
       }).then(res => {
-        console.log(res)
+        if (res.code == 200) {
+          setUserInfo(JSON.stringify(res.data));
+          this.$router.push('/home');
+        }
       }).catch(res => {
 
       })
