@@ -1,1 +1,1 @@
-import { getRequest, postRequest } from '@/libs/axios'
+import { getRequest, postRequest } from '@/libs/axios';

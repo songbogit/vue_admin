@@ -12,7 +12,7 @@
 
 <script>
 import './user.less'
-import { setUserInfo } from "../../../../libs/util";
+import { logout } from "../../../../libs/util";
 
 export default {
   name: 'User',
@@ -26,8 +26,7 @@ export default {
     handleClick (name) {
       switch (name) {
         case 'logout':
-          setUserInfo('');
-          window.location.reload();
+          logout();
           break
       }
     }

@@ -142,8 +142,12 @@
               if (res.code == 200) {
                 if (type == 3) {
                   const data = res.data;
-                  this.list = data.content || [];
-                  this.page.total = data.totalElements;
+                  if (!this.unPage) {
+                    this.list = data.list || [];
+                    this.page.total = data.total;
+                  } else {
+                    this.list = data;
+                  }
                 }
                 this.$emit('on-success', type, res.data || {}); // 响应组件请求成功监听，特殊处理
                 if (!unFresh) { // 需要刷新数据
@@ -167,12 +171,10 @@
       },
       // emitManagerHandler, 响应事件触发
       emitManagerHandler(type, data) {
-        let [handler, handlerData, isAsync, unMsg, unFresh, params] = [null, null, data.isAsync, data.unMsg, data.unFresh, data.params || {}]; // 方法、是否异步、参数
+        let [handler, handlerData, isAsync, unMsg, unFresh, params] = [null, null, data.isAsync, data.unMsg, data.unFresh, data.params || {}, data.isBatch]; // 方法、是否异步、参数、是否为批量操作
         const {save, del, search, getDetail} = this.handlers;
         switch (type) {
           case 3: handler = search;if (this.search) handler = this.handlers[this.search]; handlerData = this.getSearchData();break; // 查
-          case 0: handler = save;handlerData = params.entity;break;    // 增
-          case 4: handler = getDetail;handlerData = {id: params.id};break; // 根据 id 获取详情
           case 1: handler = del;handlerData = {ids: [params.id].join(',')};break; // 根据id 删
           case 2: // 批量删
             handlerData = {ids: this.removeChecked().join(',')};
@@ -181,6 +183,7 @@
           default:
             handler = this.handlers[type];handlerData = params;break; // 骚操作，直接传方法名
         }
+        console.log(handlerData, type)
         this.managerHandler(handler, handlerData, type, data, isAsync, unFresh, unMsg);
       }
     },

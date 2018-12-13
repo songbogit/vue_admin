@@ -6,7 +6,12 @@ import { forEach, hasOneOf, objEqual } from '@/libs/tools'
 export const TOKEN_KEY = 'userInfo'
 
 export const setUserInfo = (token) => {
-  Cookies.set(TOKEN_KEY, token, {expires: 1})
+  Cookies.set(TOKEN_KEY, token, {expires: 1});
+}
+
+export const logout = () => {
+  Cookies.set(TOKEN_KEY, '', {expires: 1});
+  window.location.reload();
 }
 
 export const getUserInfo = () => {

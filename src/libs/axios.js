@@ -3,6 +3,7 @@ import {Message} from 'iview'
 import Cookies from 'js-cookie'
 import {stringify} from 'qs'
 import router from './../router';
+import { logout } from "./util";
 
 // 统一请求路径前缀
 // let base = process.env.NODE_ENV === 'production' ? config.baseUrl.pro : config.baseUrl.dev;
@@ -32,9 +33,8 @@ axios.interceptors.response.use(response => {
       case 401:
         Message.error(data.message)
         // 未登录 清除已登录状态
-        Cookies.set('userInfo', '')
-        router.push('/login')
-        break
+        logout();
+        break;
       case 403:
         // 没有权限
         if (data.message !== null) {
@@ -67,9 +67,6 @@ export const getRequest = (url, params) => {
     method: 'get',
     url: `${base}${url}`,
     params: params,
-    headers: {
-      'accessToken': accessToken
-    }
   })
 }
 
