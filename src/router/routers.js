@@ -167,6 +167,16 @@ export default [
           notCache: true
         },
         component: () => import('@/view/page-manager/template-manager/TemplateManager.vue')
+      },
+      {
+        path: 'template-edit',
+        name: 'template-edit',
+        meta: {
+          title: '模板新建&编辑',
+          icon: 'ios-settings',
+          notCache: true
+        },
+        component: () => import('@/view/page-manager/template-manager/TemplateEdit.vue')
       }
     ]
   },

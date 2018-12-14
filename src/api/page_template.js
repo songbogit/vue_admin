@@ -19,3 +19,18 @@ export const pageTemplateList = (params) => {
 export const getAllBlock = (params) => {
   return getRequest('/page/template/getAllBlocks', params);
 }
+
+// 查看模板详情
+export const getTemplateDetail = (params, id) => {
+  return getRequest('/page/template/templatePreview/' + id, params);
+}
+
+// 删除模板的模块
+export const deleteTemplateBlock = (params) => {
+  return postRequest('/page/template/deleteTemplateLayout', params);
+}
+
+// 排序模板中的模块
+export const sortTemplateBlock = (params) => {
+  return postRequest('/page/template/sortTemplateBlocks', params);
+}

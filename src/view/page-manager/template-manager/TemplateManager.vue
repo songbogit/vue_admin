@@ -7,11 +7,11 @@
       <Button class="mr-10" type="primary" icon="md-add">新建模板</Button>
     </div>
     <div class="mt-20 clear borderB">
-      <div class="item left border radius4 ivu-card-shadow mr-20 mb-20 cursor relative" v-for="(item, index) of list" :key="index">
+      <div class="item left border radius4 ivu-card-shadow mr-20 mb-20 relative" v-for="(item, index) of list" :key="index">
         <div class="item-icon center pd-10 borderB">
           <img :src="item.thumb" class="item-img">
         </div>
-        <div class="item-title bold nowrap pl-10 pr-10">{{item.name}}</div>
+        <div class="item-title bold nowrap pl-10 pr-10 cursor" title="点击编辑模板" @click="edit(item.id)">{{item.name}}</div>
         <Icon type="ios-trash" class="item-del hide cl-error" title="删除模块"/>
       </div>
     </div>
@@ -60,6 +60,12 @@
             this.page.total = res.data.total || 0;
           }
         }).catch(res => {})
+      },
+      // 跳转模板编辑页面
+      edit(id) {
+        this.$store.commit('setTemplateEditId', id);
+        sessionStorage.setItem('templateEditId', id);
+        this.$router.push('/page-template/template-edit');
       }
     },
     created() {
