@@ -68,6 +68,7 @@
       }
     },
     methods: {
+      // 上移操作的请求
       moveTop() {
         if (this.editId) {
           const ids = this.layouts.map(item => item.id);
@@ -76,7 +77,7 @@
           this.showSpin = true;
           sortTemplateBlock({
             template_id: this.editId,
-            sort: ids
+            sort: ids.join(',')
           }).then(res => {
             this.showSpin = false;
             if (res.code == 200) {
@@ -89,13 +90,37 @@
           this.moveLocalTop();
         }
       },
+      // 更新data数据
       moveLocalTop() {
         const [first, second] = [this.layouts[this.actionIndex], this.layouts[this.actionIndex - 1]];
         this.layouts.splice(this.actionIndex - 1, 2, first, second);
       },
+      // 下移操作的请求
       moveBottom() {
-
+        if (this.editId) {
+          const ids = this.layouts.map(item => item.id);
+          const [first, second] = [ids[this.actionIndex + 1], ids[this.actionIndex]];
+          ids.splice(this.actionIndex, 2, first, second);
+          this.showSpin = true;
+          sortTemplateBlock({
+            template_id: this.editId,
+            sort: ids.join(',')
+          }).then(res => {
+            this.showSpin = false;
+            if (res.code == 200) {
+              this.moveLocalBottom();
+            }
+          })
+        } else {
+          this.moveLocalBottom();
+        }
       },
+      // 更新data数据
+      moveLocalBottom() {
+        const [first, second] = [ids[this.actionIndex + 1], ids[this.actionIndex]];
+        this.layouts.splice(this.actionIndex, 2, first, second);
+      },
+      // 删除模块请求
       deleteBlock() {
         if (this.editId) {
           this.showSpin = true;
@@ -113,11 +138,13 @@
           })
         }
       },
-      addBlock() {
-
-      },
+      // 更新data数据
       delLocalBlock() {
         this.layouts.splice(this.actionIndex, 1);
+      },
+      // 添加模块请求
+      addBlock() {
+
       },
       // 计算位置，显示菜单
       showMenu(index) {
