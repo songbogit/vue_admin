@@ -34,3 +34,8 @@ export const deleteTemplateBlock = (params) => {
 export const sortTemplateBlock = (params) => {
   return postRequest('/page/template/sortTemplateBlocks', params);
 }
+
+// 添加模板模块
+export const addTemplateBlock = (params) => {
+  return postRequest('/page/template/insertTemplateLayout', params);
+}

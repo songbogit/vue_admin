@@ -25,6 +25,15 @@
         </div>
       </Col>
     </Row>
+    <ModalUtil ref="block" @on-ok="" :loading="addBlockLoading" :width="600">
+      <CheckboxGroup v-model="checkedId">
+        <Row>
+          <Col class="pl-10 pr-10 mb-10 border radius4" v-for="(item, index) of allBlocks" :key="'block'+index">
+            <img :src="imgBaseUrl + item.thumb">
+          </Col>
+        </Row>
+      </CheckboxGroup>
+    </ModalUtil>
     <ContextMenu ref="menu" :axis="axis" :menuList="menuList" @move-top="moveTop" @move-bottom="moveBottom" @delete="deleteBlock" @add="addBlock"/>
     <Spin fix v-if="showSpin">
       <Icon type="ios-loading" size=18 class="spin-icon-load"></Icon>
@@ -35,7 +44,7 @@
 
 <script>
   import ContextMenu from './../../components/ContextMenu';
-  import {getTemplateDetail, deleteTemplateBlock, sortTemplateBlock} from "../../../api/page_template";
+  import {getTemplateDetail, deleteTemplateBlock, sortTemplateBlock, getAllBlock, addTemplateBlock} from "../../../api/page_template";
   import { imgBaseUrl } from "../../../config";
 
   export default {
@@ -46,6 +55,7 @@
     data() {
       return {
         showSpin: false,
+        addBlockLoading: false,
         imgBaseUrl: imgBaseUrl,
         menuList: [
           {title: '上移模块', handler: 'move-top'},
@@ -59,7 +69,9 @@
           x: 0,
           y: 0
         },
-        actionIndex: null
+        actionIndex: null,
+        checkedId: null,
+        allBlocks: []
       }
     },
     computed: {
@@ -163,6 +175,20 @@
         }
         this.actionIndex = index;
         this.$refs['menu'].isShow = true;
+      },
+      // 获取详情
+      getTemplateDetail() {
+        this.showSpin = true;
+        getTemplateDetail({}, this.editId).then(res => {
+          this.showSpin = false;
+          const {code, data} = res;
+          if (code == 200) {
+            this.layouts = data.layouts || [];
+            this.detail = data.pageTemplage || {};
+          }
+        }).catch(res => {
+          this.showSpin = false;
+        });
       }
     },
     mounted() {
@@ -182,16 +208,15 @@
     created() {
       if (this.editId) {
         document.title = '编辑模板';
-        getTemplateDetail({}, this.editId).then(res => {
-          const {code, data} = res;
-          if (code == 200) {
-            this.layouts = data.layouts || [];
-            this.detail = data.pageTemplage || {};
-          }
-        });
+        this.getTemplateDetail();
       } else {
         document.title = '创建模板';
       }
+      getAllBlock().then(res => {
+        if (res.code == 200) {
+          this.allBlocks = res.data || [];
+        }
+      })
     },
     // 路由离开之前给个提示，编辑的情况下id会清空
     beforeRouteLeave(to, from, next) {
