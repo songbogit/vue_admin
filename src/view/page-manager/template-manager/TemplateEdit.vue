@@ -1,11 +1,14 @@
 <template>
   <Card>
     <Row class="relative container">
-      <div class="layout absolute">
+      <div class="layout absolute border">
         <div class="pb-10 bgf2 template-title">
           <p class="nowrap">{{detail.name || '请填写标题'}}</p>
         </div>
         <img v-for="(item, index) of layouts" :key="'layout' + index" :src="imgBaseUrl + item.thumb" class="w block" @contextmenu="showMenu(index)">
+        <div class="center pt-30" v-if="layouts && !layouts.length">
+          <Button @click="addBlock" type="primary">暂无模块，点击添加</Button>
+        </div>
       </div>
       <Col span="24" class="pl-20">
         <div class="border ivu-card-shadow pl-10 pr-15 bgfff">
@@ -25,16 +28,30 @@
         </div>
       </Col>
     </Row>
-    <ModalUtil ref="block" @on-ok="" :loading="addBlockLoading" :width="600">
-      <CheckboxGroup v-model="checkedId">
-        <Row>
-          <Col class="pl-10 pr-10 mb-10 border radius4" v-for="(item, index) of allBlocks" :key="'block'+index">
-            <img :src="imgBaseUrl + item.thumb">
+    <ModalUtil ref="block" @on-ok="insertBlock" :loading="addBlockLoading" :width="800" @reset="block_id = null">
+      <RadioGroup v-model="block_id">
+        <Row class="block-container">
+          <Col span="8" class="pr-10 mb-10" v-for="(item, index) of allBlocks" :key="'block'+index">
+            <div class="border radius4 pl-5 pr-5">
+              <img :src="imgBaseUrl + item.thumb" class="block w">
+              <div class="mt-5 mb-5">
+                <Radio :label="item.id">{{item.name}}</Radio>
+              </div>
+            </div>
           </Col>
         </Row>
-      </CheckboxGroup>
+      </RadioGroup>
     </ModalUtil>
-    <ContextMenu ref="menu" :axis="axis" :menuList="menuList" @move-top="moveTop" @move-bottom="moveBottom" @delete="deleteBlock" @add="addBlock"/>
+    <ContextMenu
+      ref="menu"
+      :axis="axis"
+      :menuList="menuList"
+      @move-top="moveTop"
+      @move-bottom="moveBottom"
+      @delete="deleteBlock"
+      @add="addBlock"
+      @add-top="addToTop"
+    />
     <Spin fix v-if="showSpin">
       <Icon type="ios-loading" size=18 class="spin-icon-load"></Icon>
       <div>Loading</div>
@@ -61,7 +78,8 @@
           {title: '上移模块', handler: 'move-top'},
           {title: '下移模块', handler: 'move-bottom'},
           {title: '删除模块', handler: 'delete'},
-          {title: '增加模块', handler: 'add'}
+          {title: '向上增加模块', handler: 'add-top'},
+          {title: '向下增加模块', handler: 'add'}
         ],
         layouts: [],
         detail: {},
@@ -70,37 +88,34 @@
           y: 0
         },
         actionIndex: null,
-        checkedId: null,
+        block_id: null,
         allBlocks: []
       }
     },
     computed: {
       editId() {
-        return this.$store.state.page.editId;
+        return Number(this.$store.state.page.editId);
       }
     },
     methods: {
       // 上移操作的请求
       moveTop() {
-        if (this.editId) {
-          const ids = this.layouts.map(item => item.id);
-          const [first, second] = [ids[this.actionIndex], ids[this.actionIndex - 1]];
-          ids.splice(this.actionIndex - 1, 2, first, second);
-          this.showSpin = true;
-          sortTemplateBlock({
-            template_id: this.editId,
-            sort: ids.join(',')
-          }).then(res => {
-            this.showSpin = false;
-            if (res.code == 200) {
-              this.moveLocalTop();
-            }
-          }).catch(res => {
-            this.showSpin = false;
-          })
-        } else {
-          this.moveLocalTop();
-        }
+        const ids = this.layouts.map(item => item.id);
+        const [first, second] = [ids[this.actionIndex], ids[this.actionIndex - 1]];
+        ids.splice(this.actionIndex - 1, 2, first, second);
+        this.showSpin = true;
+        sortTemplateBlock({
+          template_id: this.editId,
+          sort: ids.join(',')
+        }).then(res => {
+          this.showSpin = false;
+          if (res.code == 200) {
+            // this.moveLocalTop();
+            this.getTemplateDetail();
+          }
+        }).catch(res => {
+          this.showSpin = false;
+        })
       },
       // 更新data数据
       moveLocalTop() {
@@ -109,23 +124,22 @@
       },
       // 下移操作的请求
       moveBottom() {
-        if (this.editId) {
-          const ids = this.layouts.map(item => item.id);
-          const [first, second] = [ids[this.actionIndex + 1], ids[this.actionIndex]];
-          ids.splice(this.actionIndex, 2, first, second);
-          this.showSpin = true;
-          sortTemplateBlock({
-            template_id: this.editId,
-            sort: ids.join(',')
-          }).then(res => {
-            this.showSpin = false;
-            if (res.code == 200) {
-              this.moveLocalBottom();
-            }
-          })
-        } else {
-          this.moveLocalBottom();
-        }
+        const ids = this.layouts.map(item => item.id);
+        const [first, second] = [ids[this.actionIndex + 1], ids[this.actionIndex]];
+        ids.splice(this.actionIndex, 2, first, second);
+        this.showSpin = true;
+        sortTemplateBlock({
+          template_id: this.editId,
+          sort: ids.join(',')
+        }).then(res => {
+          this.showSpin = false;
+          if (res.code == 200) {
+            // this.moveLocalBottom();
+            this.getTemplateDetail();
+          }
+        }).catch(res => {
+          this.showSpin = false;
+        })
       },
       // 更新data数据
       moveLocalBottom() {
@@ -134,29 +148,54 @@
       },
       // 删除模块请求
       deleteBlock() {
-        if (this.editId) {
-          this.showSpin = true;
-          deleteTemplateBlock({
-            template_id: this.editId,
-            layout_id: this.layouts[this.actionIndex].id
-          }).then(res => {
-            this.showSpin = false;
-            if (res.code == 200) {
-              this.$Message.success(`成功删除模块${this.layouts[this.actionIndex].name}`);
-              this.delLocalBlock();
-            }
-          }).catch(res => {
-            this.showSpin = false;
-          })
-        }
+        this.showSpin = true;
+        deleteTemplateBlock({
+          template_id: this.editId,
+          layout_id: this.layouts[this.actionIndex].id
+        }).then(res => {
+          this.showSpin = false;
+          if (res.code == 200) {
+            this.$Message.success(`成功删除模块${this.layouts[this.actionIndex].name}`);
+            // this.delLocalBlock();
+            this.getTemplateDetail();
+          }
+        }).catch(res => {
+          this.showSpin = false;
+        })
       },
       // 更新data数据
       delLocalBlock() {
         this.layouts.splice(this.actionIndex, 1);
       },
-      // 添加模块请求
+      // 向下添加模块请求
       addBlock() {
-
+        this.$refs['block'].toggleShow();
+      },
+      // 向上添加模块
+      addToTop() {
+        if (this.actionIndex == 0) {
+          this.actionIndex = null;
+          this.$refs['block'].toggleShow();
+        }
+      },
+      //
+      insertBlock() {
+        if (this.block_id) {
+          this.addBlockLoading = true;
+          addTemplateBlock({
+            block_id: this.block_id,
+            template_id: this.editId,
+            layout_after: this.actionIndex!==null?this.layouts[this.actionIndex].id:0
+          }).then(res => {
+            this.addBlockLoading = false;
+            if (res.code == 200) {
+              this.$refs['block'].toggleShow();
+              this.getTemplateDetail();
+            }
+          }).catch(res => {
+            this.addBlockLoading = false;
+          })
+        }
       },
       // 计算位置，显示菜单
       showMenu(index) {
@@ -201,16 +240,15 @@
             {title: '下移模块', handler: 'move-bottom'},
             {title: '删除模块', handler: 'delete'},
             {title: '增加模块', handler: 'add'}
-          ]
+          ];
         }
       })
     },
     created() {
       if (this.editId) {
-        document.title = '编辑模板';
         this.getTemplateDetail();
       } else {
-        document.title = '创建模板';
+        this.$Message.error('编辑的模板id缓存丢失，请重新选择模板');
       }
       getAllBlock().then(res => {
         if (res.code == 200) {
@@ -218,18 +256,6 @@
         }
       })
     },
-    // 路由离开之前给个提示，编辑的情况下id会清空
-    beforeRouteLeave(to, from, next) {
-      if (this.editId) {
-        if (confirm('离开页面编辑的模板id将清空')) {
-          sessionStorage.removeItem('templateEditId');
-          this.$store.commit('setTemplateEditId', null);
-          next();
-        }
-      } else {
-        next();
-      }
-    }
   }
 </script>
 
@@ -253,5 +279,9 @@
     from { transform: rotate(0deg);}
     50%  { transform: rotate(180deg);}
     to   { transform: rotate(360deg);}
+  }
+  .block-container {
+    height: 520px;
+    overflow-y: auto;
   }
 </style>

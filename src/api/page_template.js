@@ -15,6 +15,11 @@ export const pageTemplateList = (params) => {
   return getRequest('/page/template/list', params);
 }
 
+// 创建模板
+export const createTemplate = (params) => {
+  return postRequest('/page/template/create', params);
+}
+
 // 获取所有模块
 export const getAllBlock = (params) => {
   return getRequest('/page/template/getAllBlocks', params);

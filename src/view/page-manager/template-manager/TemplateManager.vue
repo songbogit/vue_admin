@@ -2,9 +2,9 @@
   <Card>
     <div>
       <span class="mr-10">模块名称：<Input class="w200" v-model="page.name" placeholder="模块名称"/></span>
-      <Button class="mr-10" type="primary" icon="md-search">查询</Button>
-      <Button class="mr-10" type="primary">清除查询条件</Button>
-      <Button class="mr-10" type="primary" icon="md-add">新建模板</Button>
+      <Button class="mr-10" type="primary" icon="md-search" @click="search">查询</Button>
+      <Button class="mr-10" type="primary" @click="page.name = null">清除查询条件</Button>
+      <Button class="mr-10" type="primary" icon="md-add" @click="showModal">新建模板</Button>
     </div>
     <div class="mt-20 clear borderB">
       <div class="item left border radius4 ivu-card-shadow mr-20 mb-20 relative" v-for="(item, index) of list" :key="index">
@@ -20,11 +20,14 @@
             @on-change="pageChange" @on-page-size-change="pageSizeChange" :page-size-opts="[10,20,50]"
             size="small" show-total show-elevator show-sizer></Page>
     </div>
+    <ModalUtil ref="create" title="创建模板" :loading="loading" @reset="resetCreateData" @on-ok="okHandler">
+      <FormUtil ref="createForm" :model="createModel" :rules="createRule" :comp="createComp" @on-submit="submit"></FormUtil>
+    </ModalUtil>
   </Card>
 </template>
 
 <script>
-  import { pageTemplateList, getAllBlock } from "../../../api/page_template";
+  import { pageTemplateList, createTemplate } from "../../../api/page_template";
 
   export default {
     name: "TemplateManager",
@@ -36,10 +39,55 @@
           pageSize: 10,
           name: null
         },
-        list: []
+        list: [],
+        createModel: {
+          name: null,
+          status: 0,
+          // thumb: [],
+          thumb: 'http://p2.img.cctvpic.com/oms/upload/image/20181019/CkYiPlvJjKGAKxOZAAF418jPZwE274.jpg'
+        },
+        loading: false,
+        createRule: {
+          name: [
+            { required: true, type: 'string', message: '请输入模板名称', trigger: 'blur' }
+          ],
+          // thumb: [
+          //   { required: true, type: 'array', message: '请选择模板示图', trigger: 'change' }
+          // ]
+        },
+        createComp: [
+          {compName: 'Input', label: '标题：', value: 'name', placeholder: '主标题'},
+          // {compName: 'upload', label: '展示图片：', value: 'img'},
+        ]
       }
     },
     methods: {
+      search() {
+        this.$refs['manager'].emitManagerHandler(3, {
+          unFresh: true
+        })
+      },
+      showModal() {
+        this.$refs['create'].toggleShow();
+      },
+      okHandler() {
+        this.$refs['createForm'].submit();
+      },
+      submit(entity) {
+        this.loading = true
+        createTemplate(entity).then(res => {
+          this.loading = false;
+        }).catch(res => {
+          this.loading = false;
+        })
+      },
+      resetCreateData() {
+        this.createModel = {
+          name: null,
+          status: 0,
+          thumb: [],
+        }
+      },
       pageChange(pageNum) {
         this.page.pageNum = pageNum;
         this.getList();

@@ -183,7 +183,7 @@
    */
   function renderEvent(key, compName) {
     return {
-      'on-change': (event) => {console.log(event)
+      'on-change': (event) => {
         this.model[key] = ['CheckboxGroup', 'RadioGroup', 'Select', 'DatePicker', 'Checkbox'].indexOf(compName) > -1 ? event : event.target.value;
       }
     }
