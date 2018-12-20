@@ -106,7 +106,7 @@
         this.showSpin = true;
         sortTemplateBlock({
           template_id: this.editId,
-          sort: ids.join(',')
+          sortStr: ids.join(',')
         }).then(res => {
           this.showSpin = false;
           if (res.code == 200) {
@@ -130,7 +130,7 @@
         this.showSpin = true;
         sortTemplateBlock({
           template_id: this.editId,
-          sort: ids.join(',')
+          sortStr: ids.join(',')
         }).then(res => {
           this.showSpin = false;
           if (res.code == 200) {
