@@ -94,7 +94,7 @@
     },
     computed: {
       editId() {
-        return Number(this.$store.state.page.editId);
+        return Number(this.$store.state.page.editTemplateId);
       }
     },
     methods: {

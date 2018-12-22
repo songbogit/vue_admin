@@ -183,7 +183,6 @@
           default:
             handler = this.handlers[type];handlerData = params;break; // 骚操作，直接传方法名
         }
-        console.log(handlerData, type)
         this.managerHandler(handler, handlerData, type, data, isAsync, unFresh, unMsg);
       }
     },

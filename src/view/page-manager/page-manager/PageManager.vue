@@ -122,7 +122,10 @@
                   class: classes,
                   on: {
                     click: () => {
-
+                      const id = params.row.id;
+                      this.$store.commit('setPageEditId', id);
+                      localStorage.setItem('pageEditId', id);
+                      this.$router.push('/page-template/page-edit');
                     }
                   }
                 }, '页面管理'),

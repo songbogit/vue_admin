@@ -128,8 +128,36 @@
 </template>
 
 <script>
+  import {getPageDetail} from "../../../api/page_template";
+
   export default {
-    name: "PageEditor"
+    name: "PageEditor",
+    data() {
+      return {
+
+      }
+    },
+    computed: {
+      editId() {
+        return Number(this.$store.state.page.editPageId);
+      }
+    },
+    methods: {
+      getPageDetail() {
+        getPageDetail({}, this.editId).then(res => {
+
+        }).catch(res => {
+
+        })
+      }
+    },
+    created() {
+      if (!this.editId) {
+        this.$Message.error('页面编辑缓存id丢失，请重新选择页面');
+      } else {
+        this.getPageDetail();
+      }
+    }
   }
 </script>
 

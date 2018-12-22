@@ -139,8 +139,8 @@ export default [
         component: () => import('@/view/page-manager/page-manager/PageManager.vue')
       },
       {
-        path: 'page-editor',
-        name: 'page-editor',
+        path: 'page-edit',
+        name: 'page-edit',
         meta: {
           title: '页面编辑',
           icon: 'ios-settings',
@@ -149,8 +149,8 @@ export default [
         component: () => import('@/view/page-manager/page-manager/PageEditor.vue')
       },
       {
-        path: 'content-editor',
-        name: 'content-editor',
+        path: 'content-edit',
+        name: 'content-edit',
         meta: {
           title: '内容编辑',
           icon: 'ios-settings',

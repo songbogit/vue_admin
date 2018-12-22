@@ -112,7 +112,7 @@
       // 跳转模板编辑页面
       edit(id) {
         this.$store.commit('setTemplateEditId', id);
-        sessionStorage.setItem('templateEditId', id);
+        localStorage.setItem('templateEditId', id);
         this.$router.push('/page-template/template-edit');
       }
     },

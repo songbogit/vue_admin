@@ -20,6 +20,12 @@ export const createTemplate = (params) => {
   return postRequest('/page/template/create', params);
 }
 
+
+/**
+ * 模板编辑
+ * @param params
+ * @returns {*}
+ */
 // 获取所有模块
 export const getAllBlock = (params) => {
   return getRequest('/page/template/getAllBlocks', params);
@@ -43,4 +49,15 @@ export const sortTemplateBlock = (params) => {
 // 添加模板模块
 export const addTemplateBlock = (params) => {
   return postRequest('/page/template/insertTemplateLayout', params);
+}
+
+/**
+ * 页面编辑
+ * @param params
+ * @param id
+ * @returns {*}
+ */
+// 获取页面详情
+export const getPageDetail = (params, id) => {
+  return getRequest('/page/management/preview/' + id, params);
 }
