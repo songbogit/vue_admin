@@ -1,11 +1,14 @@
 <template>
   <Card>
     <div>
-      <SearchItem>页面名称：<Input placeholder="页面名称" class="w200"/></SearchItem>
-      <SearchItem>创建者：<Input placeholder="创建者" class="w200"/></SearchItem>
+      <SearchItem>页面名称：<Input placeholder="页面名称" class="w200" v-model="searchData.name"/></SearchItem>
+      <SearchItem>创建者：<Input placeholder="创建者" class="w200" v-model="searchData.created_username"/></SearchItem>
       <SearchItem>
         页面类型：
-        <Select placeholder="请选择" class="w200"></Select>
+        <Select placeholder="请选择" class="w200" v-model="searchData.type">
+          <Option :value="0">页面</Option>
+          <Option :value="1">专题</Option>
+        </Select>
       </SearchItem>
       <SearchItem><Button type="primary" icon="md-search" @click="search">查询</Button></SearchItem>
       <SearchItem><Button type="primary" @click="resetSearch">重置查询条件</Button></SearchItem>
@@ -52,7 +55,9 @@
       return {
         loading: false,
         searchData: {
-
+          name: null,
+          created_username: null,
+          type: null
         },
         columns: [
           {
@@ -189,22 +194,14 @@
         addPageRule: {
 
         },
-        addPageComp: [
-          {compName: 'Input', label: '页面名称', value: 'name', placeholder: '请输入页面名称'},
-          {compName: 'Input', label: '关键字', value: 'key', placeholder: '请输入关键字'},
-          {compName: 'RadioGroup', label: '页面类型', value: 'type', list:[{label: '页面', value: '0'},{label: '专题', value: '1'}]},
-          {compName: 'Checkbox', label: '是否使用模板', value: 'useable', placeholder: '请输入页面名称'},
-          {compName: 'Checkbox', label: '保存后跳转到页面属性编辑', value: 'false', placeholder: '请输入页面名称'},
-        ],
         templates: []
       }
     },
     methods: {
       search() {
-
-      },
-      resetSearch() {
-
+        this.$refs['manager'].emitManagerHandler(3, {
+          unFresh: true
+        })
       },
       // 新建页面
       toggleAddPage() {
@@ -229,6 +226,13 @@
             instance_type
           }
         })
+      },
+      resetSearch() {
+        this.searchData = {
+          name: null,
+          created_username: null,
+          type: null
+        };
       },
       resetPageData() {
         this.addPageData = {
