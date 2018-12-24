@@ -144,7 +144,8 @@ export default [
         meta: {
           title: '页面编辑',
           icon: 'ios-settings',
-          notCache: true
+          notCache: true,
+          hideInMenu: true
         },
         component: () => import('@/view/page-manager/page-manager/PageEditor.vue')
       },
@@ -154,7 +155,8 @@ export default [
         meta: {
           title: '内容编辑',
           icon: 'ios-settings',
-          notCache: true
+          notCache: true,
+          hideInMenu: true
         },
         component: () => import('@/view/page-manager/page-manager/ContentEditor.vue')
       },

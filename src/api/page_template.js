@@ -1,4 +1,4 @@
-import { getRequest, postRequest } from '@/libs/axios';
+import { getRequest, postRequest, postJson } from '@/libs/axios';
 
 // 页面分页
 export const pageList = (params) => {
@@ -36,6 +36,11 @@ export const getTemplateDetail = (params, id) => {
   return getRequest('/page/template/templatePreview/' + id, params);
 }
 
+// 更新模板
+export const updateTemplate = (params) => {
+  return postRequest('/page/template/update', params);
+}
+
 // 删除模板的模块
 export const deleteTemplateBlock = (params) => {
   return postRequest('/page/template/deleteTemplateLayout', params);
@@ -60,4 +65,34 @@ export const addTemplateBlock = (params) => {
 // 获取页面详情
 export const getPageDetail = (params, id) => {
   return getRequest('/page/management/preview/' + id, params);
+}
+
+// 删除页面模块
+export const deletePageBlock = (params) => {
+  return postRequest('/page/management/deleteInstanceConfig', params);
+}
+
+// 获取页面模块详情
+export const getPageBlockDetail = (params) => {
+  return getRequest('/page/management/getConfig', params);
+}
+
+// 增加页面模块
+export const insertPageBlock = (params) => {
+  return postRequest('/page/management/insertInstanceConfig', params);
+}
+
+// 更新页面模块信息
+export const updatePageBlock = (params) => {
+  return postJson('/page/management/updateConfigs', params);
+}
+
+// 页面模块排序
+export const sortPageBlock = (params) => {
+  return postRequest('/page/management/sortInstanceConfigs', params);
+}
+
+// 更新页面信息
+export const updatePage = (params) => {
+  return postJson('/page/management/updateInstance', params);
 }

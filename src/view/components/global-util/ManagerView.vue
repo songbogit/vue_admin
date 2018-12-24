@@ -171,7 +171,7 @@
       },
       // emitManagerHandler, 响应事件触发
       emitManagerHandler(type, data) {
-        let [handler, handlerData, isAsync, unMsg, unFresh, params] = [null, null, data.isAsync, data.unMsg, data.unFresh, data.params || {}, data.isBatch]; // 方法、是否异步、参数、是否为批量操作
+        let [handler, handlerData, isAsync, unMsg, unFresh, params, isBatch] = [null, null, data.isAsync, data.unMsg, data.unFresh, data.params || {}, data.isBatch]; // 方法、是否异步、参数、是否为批量操作
         const {save, del, search, getDetail} = this.handlers;
         switch (type) {
           case 3: handler = search;if (this.search) handler = this.handlers[this.search]; handlerData = this.getSearchData();break; // 查
@@ -181,7 +181,10 @@
             handler = del;
             break;
           default:
-            handler = this.handlers[type];handlerData = params;break; // 骚操作，直接传方法名
+            handler = this.handlers[type];
+            handlerData = params;
+            if (isBatch) params.ids = this.removeChecked().join(',');
+            break; // 骚操作，直接传方法名
         }
         this.managerHandler(handler, handlerData, type, data, isAsync, unFresh, unMsg);
       }

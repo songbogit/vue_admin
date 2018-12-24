@@ -8,14 +8,14 @@ import { logout } from "./util";
 // 统一请求路径前缀
 // let base = process.env.NODE_ENV === 'production' ? config.baseUrl.pro : config.baseUrl.dev;
 const base = '/api'
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'// 配置post请求头类型
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'// 配置post请求头类型
 // 超时设定
 axios.defaults.timeout = 15000
 
 axios.interceptors.request.use(config => {
-  if (config.method === 'post') {
-    config.data = stringify(config.data)
-  }
+  // if (config.method === 'post') {
+  //   config.data = stringify(config.data)
+  // }
   return config
 }, err => {
   Message.error('请求超时')
@@ -74,7 +74,18 @@ export const postRequest = (url, params) => {
   return axios({
     method: 'post',
     url: `${base}${url}`,
-    data: params
+    data: stringify(params)
+  })
+}
+
+export const postJson = (url, params) => {
+  return axios({
+    method: 'post',
+    url: `${base}${url}`,
+    data: params,
+    headers: {
+      'Content-Type': 'application/json'
+    }
   })
 }
 

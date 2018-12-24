@@ -15,14 +15,14 @@
           <div class="modal-title pl-20 borderB mb-15">模板属性</div>
           <Form :label-width="100">
             <FormItem label="模板名称：">
-              <Input v-model="detail.name"/>
-            </FormItem>
+            <Input v-model="detail.name"/>
+          </FormItem>
             <FormItem label="模板缩略图：">
               <Input v-model="detail.thumb"/>
             </FormItem>
             <img :src="detail.thumb" class="w150 block" style="margin-left: 100px;">
             <FormItem class="mt10">
-              <Button type="primary">保存修改</Button>
+              <Button type="primary" @click="update">保存修改</Button>
             </FormItem>
           </Form>
         </div>
@@ -61,7 +61,7 @@
 
 <script>
   import ContextMenu from './../../components/ContextMenu';
-  import {getTemplateDetail, deleteTemplateBlock, sortTemplateBlock, getAllBlock, addTemplateBlock} from "../../../api/page_template";
+  import {getTemplateDetail, deleteTemplateBlock, sortTemplateBlock, getAllBlock, addTemplateBlock, updateTemplate} from "../../../api/page_template";
   import { imgBaseUrl } from "../../../config";
 
   export default {
@@ -175,8 +175,10 @@
       addToTop() {
         if (this.actionIndex == 0) {
           this.actionIndex = null;
-          this.$refs['block'].toggleShow();
+        } else {
+          this.actionIndex = this.actionIndex - 1;
         }
+        this.$refs['block'].toggleShow();
       },
       //
       insertBlock() {
@@ -205,7 +207,7 @@
           x: clientX,
           y: clientY
         };
-        const len = this.menuList.length;
+        const len = this.layouts.length;
         if (index == 0) {
           this.menuList[0].unable = true;
         }
@@ -228,6 +230,19 @@
         }).catch(res => {
           this.showSpin = false;
         });
+      },
+      update() {
+        let {thumb, name} = this.detail;
+        this.showSpin = true;
+        updateTemplate({
+          id: this.editId,
+          thumb: thumb,
+          name: name
+        }).then(res => {
+          this.showSpin = false;
+        }).catch(res => {
+          this.showSpin = false;
+        })
       }
     },
     mounted() {
@@ -239,7 +254,8 @@
             {title: '上移模块', handler: 'move-top'},
             {title: '下移模块', handler: 'move-bottom'},
             {title: '删除模块', handler: 'delete'},
-            {title: '增加模块', handler: 'add'}
+            {title: '向上增加模块', handler: 'add-top'},
+            {title: '向下增加模块', handler: 'add'}
           ];
         }
       })
