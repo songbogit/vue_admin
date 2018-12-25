@@ -96,3 +96,11 @@ export const sortPageBlock = (params) => {
 export const updatePage = (params) => {
   return postJson('/page/management/updateInstance', params);
 }
+
+/**
+ * 页面内容编辑
+ */
+// 获取页面内容详情
+export const getPageContent = (params) => {
+  return getRequest('/page/dataSource/getById', params);
+}

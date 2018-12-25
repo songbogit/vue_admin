@@ -1,7 +1,8 @@
 export default {
   state: {
     editTemplateId: localStorage.getItem('templateEditId'),
-    editPageId: localStorage.getItem('pageEditId')
+    editPageId: localStorage.getItem('pageEditId'),
+    editContentId: localStorage.getItem('contentEditId'),
   },
   mutations: {
     setTemplateEditId(state, id) {
@@ -9,6 +10,9 @@ export default {
     },
     setPageEditId(state, id) {
       state.editPageId = id;
+    },
+    setContentEditId(state, id) {
+      state.editContentId = id;
     }
   }
 }

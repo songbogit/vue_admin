@@ -82,16 +82,22 @@
               @on-change="pageChange" @on-page-size-change="pageSizeChange" :page-size-opts="[10,20]"
               size="small" show-total show-elevator show-sizer></Page>
       </div>
-
     </ModalUtil>
+    <Spin fix v-if="showSpin">
+      <Icon type="ios-loading" size=18 class="spin-icon-load"></Icon>
+      <div>Loading</div>
+    </Spin>
   </Card>
 </template>
 
 <script>
+  import { getPageContent } from "../../../api/page_template";
+
   export default {
     name: "ContentEditor",
     data() {
       return {
+        showSpin: false,
         loading: false,
         module_col: [
           {
@@ -312,19 +318,49 @@
         ]
       }
     },
+    computed: {
+      editId() {
+        return Number(this.$store.state.page.editContentId);
+      }
+    },
     methods: {
       pageChange(current) {
 
       },
       pageSizeChange(pageSize) {
 
+      },
+      getPageContent() {
+        this.showSpin = true;
+        getPageContent({
+          id: this.editId
+        }).then(res => {
+          this.showSpin = false;
+        }).catch(res => {
+          this.showSpin = false;
+        })
       }
     },
     mounted() {
       this.$refs['create'].toggleShow();
+    },
+    created() {
+      if (!this.editId) {
+        this.$Message.error('页面内容编辑缓存id丢失，请重新选择页面');
+      } else {
+        this.getPageContent();
+      }
     }
   }
 </script>
 
 <style scoped>
+  .spin-icon-load{
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg);}
+    50%  { transform: rotate(180deg);}
+    to   { transform: rotate(360deg);}
+  }
 </style>

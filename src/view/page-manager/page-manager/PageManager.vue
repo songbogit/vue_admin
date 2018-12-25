@@ -139,7 +139,10 @@
                   class: classes,
                   on: {
                     click: () => {
-
+                      const id = params.row.id;
+                      this.$store.commit('setContentEditId', id);
+                      localStorage.setItem('contentEditId', id);
+                      this.$router.push('/page-template/content-edit');
                     }
                   }
                 }, '内容管理'),

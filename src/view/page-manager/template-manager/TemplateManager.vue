@@ -2,7 +2,7 @@
   <Card>
     <div>
       <span class="mr-10">模块名称：<Input class="w200" v-model="page.name" placeholder="模块名称"/></span>
-      <Button class="mr-10" type="primary" icon="md-search" @click="search">查询</Button>
+      <Button class="mr-10" type="primary" icon="md-search" @click="getList">查询</Button>
       <Button class="mr-10" type="primary" @click="page.name = null">清除查询条件</Button>
       <Button class="mr-10" type="primary" icon="md-add" @click="showModal">新建模板</Button>
     </div>
@@ -62,11 +62,6 @@
       }
     },
     methods: {
-      search() {
-        this.$refs['manager'].emitManagerHandler(3, {
-          unFresh: true
-        })
-      },
       showModal() {
         this.$refs['create'].toggleShow();
       },
