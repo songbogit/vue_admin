@@ -44,7 +44,13 @@
               <Input v-model="pageDetail.name"/>
             </FormItem>
             <FormItem label="关键字：">
-              <Input v-model="pageDetail.keywords"/>
+              <div>
+                <Tag color="primary" type="dot" v-for="(item, index) of pageDetail.keywords" :key="'tag' + index">{{item}}</Tag>
+              </div>
+              <div>
+                <Input style="width: 60%" @keyup.enter="addPageTag" v-model="keyword"/>
+                <Button type="primary" class="ml-5" @click="addPageTag">添加关键字</Button>
+              </div>
             </FormItem>
             <FormItem label="页面类型：">
               <RadioGroup v-model="pageDetail.type">
@@ -67,10 +73,17 @@
               <i-switch v-model="pageDetail.can_share"></i-switch>
             </FormItem>
             <FormItem label="分享缩略图：">
-              <Input />
+              <MyUpload
+                class="block"
+                :upload-list="uploadList"
+                @on-remove="removeHandler"
+                @on-success="successHandler"
+                :format="format"
+                :max-size="2048"
+              ></MyUpload>
             </FormItem>
             <FormItem label="分享说明文字：">
-              <Input type="textarea" :rows="3"/>
+              <Input type="textarea" :rows="3" v-model="pageDetail.share_description"/>
             </FormItem>
             <FormItem>
               <Button type="primary" @click="updatePage">保存修改</Button>
@@ -80,7 +93,7 @@
       </Col>
       <Col span="12" class="pl-15">
         <div v-if="actionBlockIndex !== null" class="border ivu-card-shadow pl-10 pr-15 bgfff">
-          <div class="modal-title pl-20 borderB mb-15">模块属性编辑器 [名称：大图/类型：轮播图模块]</div>
+          <div class="modal-title pl-20 borderB mb-15">模块属性编辑器 [名称：{{blockDetail.title}}]</div>
           <Form :label-width="100">
             <FormItem label="模块名称：">
               <Input v-model="blockDetail.title"/>
@@ -89,7 +102,13 @@
               <i-switch v-model="blockDetail.has_titlekeyword"></i-switch>
             </FormItem>
             <FormItem label="关键字：" v-if="blockDetail.has_titlekeyword">
-              <Input v-model="blockDetail.keyWords"/>
+              <div>
+                <Tag color="primary" type="dot" v-for="(item, index) of blockDetail.keyWords" :key="'tag' + index">{{item}}</Tag>
+              </div>
+              <div>
+                <Input style="width: 60%" @keyup.enter="addBlockTag" v-model="blockKeyword"/>
+                <Button type="primary" class="ml-5" @click="addBlockTag">添加关键字</Button>
+              </div>
             </FormItem>
             <FormItem label="双标题：">
               <i-switch v-model="blockDetail.double_title"></i-switch>
@@ -176,15 +195,20 @@
 <script>
   import ContextMenu from './../../components/ContextMenu';
   import { imgBaseUrl } from "../../../config";
+  import MyUpload from './../../components/global-util/MyUpload';
   import {getPageDetail, getAllBlock, insertPageBlock, sortPageBlock, deletePageBlock, getPageBlockDetail, updatePage, updatePageBlock} from "../../../api/page_template";
 
   export default {
     name: "PageEditor",
     components: {
-      ContextMenu
+      ContextMenu,
+      MyUpload
     },
     data() {
       return {
+        format: ['jpg', 'jpeg', 'png'],
+        keyword: '',
+        blockKeyword: '',
         showSpin: false,
         addBlockLoading: false,
         imgBaseUrl: imgBaseUrl,
@@ -213,7 +237,7 @@
           filter_url: '',
           has_filter: false,
           id: 2,
-          keywords: "",
+          keywords: [],
           name: "新建页面0",
           share_description: '',
           templateid: 0,
@@ -248,9 +272,30 @@
     computed: {
       editId() {
         return Number(this.$store.state.page.editPageId);
+      },
+      uploadList() {
+        return this.pageDetail.thumb?[this.pageDetail.thumb]:[];
       }
     },
     methods: {
+      // 添加关键字
+      addPageTag() {
+        this.pageDetail.keywords.push(this.keyword);
+        this.keyword = '';
+      },
+      addBlockTag() {
+        this.blockDetail.keywords.push(this.blockKeyword);
+        this.blockKeyword = '';
+      },
+      // 图片上传handler
+      removeHandler() {
+        this.pageDetail.thumb = '';
+      },
+      successHandler(res, file) {
+        if (res.code == 200) {
+          this.pageDetail.thumb = res.data;
+        }
+      },
       // 上移操作的请求
       moveTop() {
         const ids = this.layouts.map(item => item.id);
@@ -352,9 +397,9 @@
       },
       // 计算位置，显示菜单
       showMenu(index) {
-        console.log(this.menuList)
-        event.preventDefault();
-        const {clientX, clientY} = event;
+        const e = event || window.event;
+        e.preventDefault();
+        const {clientX, clientY} = e;
         this.axis = {
           x: clientX,
           y: clientY
@@ -397,6 +442,7 @@
             delete pageDetail.status;
             pageDetail.can_share = !!pageDetail.can_share;
             pageDetail.has_filter = !!pageDetail.has_filter;
+            pageDetail.keywords = pageDetail.keywords?pageDetail.keywords.split(','):[];
             this.pageDetail = pageDetail;
           }
         }).catch(res => {
@@ -420,6 +466,7 @@
             data.has_titlekeyword = !!data.has_titlekeyword;
             data.is_merge = !!data.is_merge;
             data.is_quote = !!data.is_quote;
+            data.keywords = data.keywords?data.keywords.split(','):[];
             delete data.adid;
             delete data.created_datetime;
             delete data.created_uid;
@@ -443,6 +490,7 @@
         data.has_titlekeyword = data.has_titlekeyword?1:0;
         data.is_merge = data.is_merge?1:0;
         data.is_quote = data.is_quote?1:0;
+        data.keywords = data.keywords.filter(item => !!item).join(',');
         this.showSpin = true;
         updatePageBlock(data).then(res => {
           this.showSpin = false;
@@ -454,6 +502,7 @@
         const pageDetail = JSON.parse(JSON.stringify(this.pageDetail));
         pageDetail.can_share = pageDetail.can_share?1:0;
         pageDetail.has_filter = pageDetail.has_filter?1:0;
+        pageDetail.keywords = pageDetail.keywords.filter(item => !!item).join(',');
         this.showSpin = true;
         updatePage(pageDetail).then(res => {
           this.showSpin = false;

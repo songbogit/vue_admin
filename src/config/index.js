@@ -1,5 +1,5 @@
 export default {
-  imgBaseUrl: 'http://39.105.158.93:8800',
+  imgBaseUrl: '/api',
   /**
    * @description token在Cookie中存储的天数，默认1天
    */
@@ -32,4 +32,4 @@ export default {
   }
 }
 
-export const imgBaseUrl = 'http://39.105.158.93:8800';
+export const imgBaseUrl = '/api';

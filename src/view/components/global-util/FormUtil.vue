@@ -21,6 +21,7 @@
 -->
 <script>
   import MyUpload from '@/view/components/global-util/MyUpload';
+  import {imgBaseUrl} from "../../../config";
   // import {aliCallbackImgUrl} from "../../../libs/aliUploadConfig";
 
   export default {
@@ -124,9 +125,6 @@
       let props = {label: item.label, prop: item.value};
       const formItem = h('FormItem', {
         props: props,
-        'class': {
-          'my-upload': item.compName == 'upload'
-        }
       }, renderDom.call(this, item, h));
       result.push(formItem);
     });
@@ -200,7 +198,7 @@
         'on-remove': removeHandler.bind(this), // 删除上传列表
         'on-success': handleSuccess.bind(_this),
         'format': item.format || ['jpg','jpeg','png'],
-        'max-size': 1024,
+        'max-size': 2048,
         'mutiple': !!item.mutiple,
         // 'on-format-error': uploadHandler.bind(this, 1, item.value), // 图片格式错误
         // 'on-exceeded-size': uploadHandler.bind(this, 2, item.value),
@@ -246,21 +244,22 @@
    * 图片上传handler
    */
   function removeHandler(index) {
-    // switch (flag) {
-    //   case 0:this.model[value] = '';break;
-    //   case 1:this.$Message.warning('请上传jpg,jpeg,png格式的图片');break;
-    //   case 2:this.$Message.warning('图片大小必须小于1M');break;
-    //   default: break;
-    // }
+    switch (flag) {
+      case 0:this.model[value] = '';break;
+      case 1:this.$Message.warning('请上传jpg,jpeg,png格式的图片');break;
+      case 2:this.$Message.warning('图片大小必须小于1M');break;
+      default: break;
+    }
     this.model[this.uploadKey].splice(index, 1);
   }
 
   /**
    * 图片上传成功
    */
-  const baseUrl = 'http://111.230.200.16/upload/uploads/'
   function handleSuccess(res, file) {
-    this.model[this.uploadKey].push(baseUrl + res.d.filename);
+    if (res.code == 200) {
+      this.model[this.uploadKey].push(res.data);
+    }
   }
 </script>
 

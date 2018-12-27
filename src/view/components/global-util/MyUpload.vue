@@ -22,7 +22,7 @@
       :before-upload="handleBeforeUpload"
       :multiple="multiple"
       type="drag"
-      action="http://111.230.200.16:8008/single-upload"
+      action="/api/uploadimg"
       style="display: inline-block;width:58px;">
       <div style="width: 58px;height:58px;line-height: 58px;">
         <Icon type="ios-camera" size="20"></Icon>
@@ -35,6 +35,9 @@
 </template>
 
 <script>
+
+  import {imgBaseUrl} from "../../../config";
+
   export default {
     name: "MyUpload",
     data () {
@@ -67,25 +70,33 @@
       onRemove: {
         type: Function,
         default() {
-          return {}
+          return () => {
+
+          }
         }
       },
       onSuccess: {
         type: Function,
         default() {
-          return {}
+          return () => {
+
+          }
         }
       },
       onFormatError: {
         type: Function,
         default() {
-          return {}
+          return () => {
+
+          }
         }
       },
       onExceededSize: {
         type: Function,
         default() {
-          return {}
+          return () => {
+
+          }
         }
       }
     },
@@ -93,7 +104,7 @@
       showList() {
         return this.uploadList.map(item => {
           return {
-            src: item,
+            src: imgBaseUrl + item,
             status: true
           }
         })
@@ -106,11 +117,13 @@
       },
       handleRemove (index) {
         this.onRemove(index);
+        this.$emit('on-remove')
       },
       handleSuccess (res, file) {
         // file.url = 'https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar';
         // file.name = '7eb99afb9d5f317c912f08b5212fd69a';
         this.onSuccess(res, file);
+        this.$emit('on-success', res, file);
       },
       handleFormatError (file) {
         const _this = this;

@@ -1,34 +1,38 @@
 <template>
   <Card style="background: #f5f7f9">
-    <Row>
-      <Col span="7">
-        <div class="content bgfff">
-          <div class="module-title">大图</div>
-          <img src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4127978443,3621625360&fm=111&gp=0.jpg" class="scroll-img">
-          <div class="module-title">横向直播模块</div>
-          <div class="list-lr clear">
-            <div class="list-lr-item" v-for="item of 6">
-              <div class="list-lr-item-state clear">
-                <div class="list-lr-item-state-info">直播中</div>
-              </div>
-              <div class="list-lr-item-title line2">小程序测试</div>
-              <div class="list-lr-item-dec line2">小程序作为2018年新产品，依赖于各大BAT的平台，自带流量，更少的成本获得更多的用户</div>
-            </div>
-          </div>
-          <div class="module-title">横图横拉模块</div>
-          <div class="list-tb">
-            <Row>
-              <Col class="list-tb-item" span="8" v-for="item of 9">
-                <div class="list-tb-item-img">
-                  <img src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4127978443,3621625360&fm=111&gp=0.jpg">
-                </div>
-                <p class="list-tb-item-dec line">往事随风去，我愿乘风随。消逝了就成为往事。回不了头。</p>
-              </Col>
-            </Row>
-          </div>
-        </div>
-      </Col>
-      <Col span="17" class="pl-20">
+    <Row class="relative" style="padding-left: 360px;min-height: 720px;">
+      <div class="content left bgfff">
+        <!--<div class="module-title">大图</div>-->
+        <!--<img src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4127978443,3621625360&fm=111&gp=0.jpg" class="scroll-img">-->
+        <!--<div class="module-title">横向直播模块</div>-->
+        <!--<div class="list-lr clear">-->
+          <!--<div class="list-lr-item" v-for="item of 6">-->
+            <!--<div class="list-lr-item-state clear">-->
+              <!--<div class="list-lr-item-state-info">直播中</div>-->
+            <!--</div>-->
+            <!--<div class="list-lr-item-title line2">小程序测试</div>-->
+            <!--<div class="list-lr-item-dec line2">小程序作为2018年新产品，依赖于各大BAT的平台，自带流量，更少的成本获得更多的用户</div>-->
+          <!--</div>-->
+        <!--</div>-->
+        <!--<div class="module-title">横图横拉模块</div>-->
+        <!--<div class="list-tb">-->
+          <!--<Row>-->
+            <!--<Col class="list-tb-item" span="8" v-for="item of 9">-->
+              <!--<div class="list-tb-item-img">-->
+                <!--<img src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4127978443,3621625360&fm=111&gp=0.jpg">-->
+              <!--</div>-->
+              <!--<p class="list-tb-item-dec line">往事随风去，我愿乘风随。消逝了就成为往事。回不了头。</p>-->
+            <!--</Col>-->
+          <!--</Row>-->
+        <!--</div>-->
+        <!--模块列表，render显示内容，1：每个模块写对应render，2：数据库保存dom，jquery覆盖对应的字段-->
+        <Collapse v-model="collapse" accordion>
+          <Panel :name="'panel'+index" v-for="(item, index) of layouts" :key="">
+            {{item.title}}
+          </Panel>
+        </Collapse>
+      </div>
+      <Col span="24" class="pl-20">
         <div class="bgfff pb-20">
           <div class="pd-15 borderB clear">
             <span class="pt-10 inline-block">模块数据内容</span>
@@ -41,7 +45,7 @@
             </div>
           </div>
           <div class="pl-15 pr-15">
-            <Tabs type="card" class="mt-20" :animated="false">
+            <Tabs type="card" class="mt-20">
               <TabPane label="模块">
                 <Table :columns="module_col" :data="module_list" :show-header="false"></Table>
                 <div class="t-right mt20">
@@ -91,12 +95,13 @@
 </template>
 
 <script>
-  import { getPageContent } from "../../../api/page_template";
+  import { getBlockContent, getPageDetail } from "../../../api/page_template";
 
   export default {
     name: "ContentEditor",
     data() {
       return {
+        layouts: [],
         showSpin: false,
         loading: false,
         module_col: [
@@ -206,11 +211,6 @@
         },
         module_list: [{}, {}],
         search_col: [
-          // {
-          //   type: 'selection',
-          //   width: 40,
-          //   align: 'center'
-          // },
           {
             render: (h, params) => {
               const props = {type: 'dashed', size: 'small'};
@@ -315,7 +315,11 @@
           {compName: 'Input', label: '左上角标文字：', value: 'leftTitle', placeholder: '左上角标文字'},
           {compName: 'RadioGroup', label: '浏览权限：', value: 'role', list: [{label: '所有用户', value: 0}, {label: '仅限会员', value: 1}]},
           {compName: 'RadioGroup', label: '硬件状态：', value: 'state', list: [{label: '发布', value: 0}, {label: '草稿', value: 1}]},
-        ]
+        ],
+        contents: [], // 模块的内容
+        keyWords: [], // 模块关键字
+        collapse: 'panel0',
+        allContents: [], // 查询到的内容
       }
     },
     computed: {
@@ -330,16 +334,30 @@
       pageSizeChange(pageSize) {
 
       },
-      getPageContent() {
+      // 获取页面模块内容
+      getBlockContent() {
         this.showSpin = true;
-        getPageContent({
+        getBlockContent({
           id: this.editId
         }).then(res => {
           this.showSpin = false;
         }).catch(res => {
           this.showSpin = false;
         })
-      }
+      },
+      //  获取页面模块
+      getPageDetail() {
+        this.showSpin = true;
+        getPageDetail({}, this.editId).then(res => {
+          this.showSpin = false;
+          if (res.code == 200) {
+            const data = res.data;
+            this.layouts = data.ConfigsList || [];
+          }
+        }).catch(res => {
+          this.showSpin = false
+        })
+      },
     },
     mounted() {
       this.$refs['create'].toggleShow();
@@ -348,13 +366,21 @@
       if (!this.editId) {
         this.$Message.error('页面内容编辑缓存id丢失，请重新选择页面');
       } else {
-        this.getPageContent();
+        this.getPageDetail();
       }
     }
   }
 </script>
 
 <style scoped>
+  .content {
+    width: 360px;
+    height: 720px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: absolute;
+    left: 0;
+  }
   .spin-icon-load{
     animation: spin 1s linear infinite;
   }

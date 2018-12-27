@@ -17,7 +17,7 @@ export const pageTemplateList = (params) => {
 
 // 创建模板
 export const createTemplate = (params) => {
-  return postRequest('/page/template/create', params);
+  return postJson('/page/template/create', params);
 }
 
 
@@ -97,10 +97,11 @@ export const updatePage = (params) => {
   return postJson('/page/management/updateInstance', params);
 }
 
+
 /**
  * 页面内容编辑
  */
-// 获取页面内容详情
-export const getPageContent = (params) => {
+// 获取模块内容
+export const getBlockContent = (params) => {
   return getRequest('/page/dataSource/getById', params);
 }

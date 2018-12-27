@@ -9,7 +9,7 @@
     <div class="mt-20 clear borderB">
       <div class="item left border radius4 ivu-card-shadow mr-20 mb-20 relative" v-for="(item, index) of list" :key="index">
         <div class="item-icon center pd-10 borderB">
-          <img :src="item.thumb" class="item-img">
+          <img :src="imgBaseUrl + item.thumb" class="item-img">
         </div>
         <div class="item-title bold nowrap pl-10 pr-10 cursor" title="点击编辑模板" @click="edit(item.id)">{{item.name}}</div>
         <Icon type="ios-trash" class="item-del hide cl-error" title="删除模块"/>
@@ -21,18 +21,20 @@
             size="small" show-total show-elevator show-sizer></Page>
     </div>
     <ModalUtil ref="create" title="创建模板" :loading="loading" @reset="resetCreateData" @on-ok="okHandler">
-      <FormUtil ref="createForm" :model="createModel" :rules="createRule" :comp="createComp" @on-submit="submit"></FormUtil>
+      <FormUtil ref="createForm" :label-width="100" :model="createModel" :rules="createRule" :comp="createComp" @on-submit="submit"></FormUtil>
     </ModalUtil>
   </Card>
 </template>
 
 <script>
+  import {imgBaseUrl} from "../../../config";
   import { pageTemplateList, createTemplate } from "../../../api/page_template";
 
   export default {
     name: "TemplateManager",
     data() {
       return {
+        imgBaseUrl: imgBaseUrl,
         page: {
           pageNum: 1,
           total: 0,
@@ -43,21 +45,21 @@
         createModel: {
           name: null,
           status: 0,
-          // thumb: [],
-          thumb: 'http://p2.img.cctvpic.com/oms/upload/image/20181019/CkYiPlvJjKGAKxOZAAF418jPZwE274.jpg'
+          thumb: [],
+          // thumb: 'http://p2.img.cctvpic.com/oms/upload/image/20181019/CkYiPlvJjKGAKxOZAAF418jPZwE274.jpg'
         },
         loading: false,
         createRule: {
           name: [
             { required: true, type: 'string', message: '请输入模板名称', trigger: 'blur' }
           ],
-          // thumb: [
-          //   { required: true, type: 'array', message: '请选择模板示图', trigger: 'change' }
-          // ]
+          thumb: [
+            { required: true, type: 'array', message: '请选择模板示图', trigger: 'change' }
+          ]
         },
         createComp: [
           {compName: 'Input', label: '标题：', value: 'name', placeholder: '主标题'},
-          // {compName: 'upload', label: '展示图片：', value: 'img'},
+          {compName: 'upload', label: '展示图片：', value: 'thumb'},
         ]
       }
     },
@@ -69,9 +71,15 @@
         this.$refs['createForm'].submit();
       },
       submit(entity) {
-        this.loading = true
-        createTemplate(entity).then(res => {
+        const params = JSON.parse(JSON.stringify(entity));
+        params.thumb = params.thumb[0];
+        this.loading = true;
+        createTemplate(params).then(res => {
           this.loading = false;
+          if (res.code == 200) {
+            this.showModal();
+            this.getList();
+          }
         }).catch(res => {
           this.loading = false;
         })
