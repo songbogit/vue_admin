@@ -78,8 +78,8 @@ export default [
         component: () => import('@/view/material-manager/video-manager/VideoManager.vue')
       },
       {
-        path: 'video-editor',
-        name: 'video-editor',
+        path: 'video-edit',
+        name: 'video-edit',
         meta: {
           title: '视频编目',
           icon: 'ios-settings',
@@ -98,8 +98,8 @@ export default [
         component: () => import('@/view/material-manager/video-group-manager/VideogroupManager.vue')
       },
       {
-        path: 'video-group-editor',
-        name: 'video-group-editor',
+        path: 'video-group-edit',
+        name: 'video-group-edit',
         meta: {
           title: '视频集编目',
           icon: 'ios-settings',

@@ -84,7 +84,7 @@
         if (this.save.modal) {
           this.$emit('on-save');
         } else {
-          this.handlers.saveHandler();
+          this.handlers['save']();
         }
       },
       // 页码改变刷新数据
@@ -123,7 +123,7 @@
       getSearchData() {
         const params = Object.assign({}, this.searchData);
         if (!this.unPage) {
-          params.page = this.page.current - 1;
+          params.page = this.page.current;
           params.size = this.page.pageSize;
         }
         return params;

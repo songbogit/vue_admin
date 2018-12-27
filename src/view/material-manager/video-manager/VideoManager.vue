@@ -17,6 +17,7 @@
 
 <script>
   import {getDateTime} from "../../../libs/tools";
+  import {getVideoList} from "../../../api/material";
 
   export default {
     name: "VideoManager",
@@ -28,11 +29,7 @@
         },
         loading: false,
         searchData: { // 查询条件
-          createTimeStart: null,
-          createTimeEnd: null,
-          itemId: null,
-          category: null,
-          isShow: null
+
         },
         columns: [
           {
@@ -113,7 +110,7 @@
                   class: classes,
                   on: {
                     click: () => {
-
+                      this.addVideo(params.row.id);
                     }
                   }
                 }, '编目')
@@ -139,12 +136,17 @@
       },
       managerError(type) {
 
+      },
+      addVideo(id = '') {
+        this.$store.commit('setVideoEditId', id);
+        this.$router.push('/material-manager/video-edit');
       }
     },
     provide() {
       return {
         handlers: {
-
+          search: getVideoList,
+          save: this.addVideo
         }
       }
     }
