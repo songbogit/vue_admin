@@ -244,12 +244,12 @@
    * 图片上传handler
    */
   function removeHandler(index) {
-    switch (flag) {
-      case 0:this.model[value] = '';break;
-      case 1:this.$Message.warning('请上传jpg,jpeg,png格式的图片');break;
-      case 2:this.$Message.warning('图片大小必须小于1M');break;
-      default: break;
-    }
+    // switch (flag) {
+    //   case 0:this.model[value] = '';break;
+    //   case 1:this.$Message.warning('请上传jpg,jpeg,png格式的图片');break;
+    //   case 2:this.$Message.warning('图片大小必须小于1M');break;
+    //   default: break;
+    // }
     this.model[this.uploadKey].splice(index, 1);
   }
 

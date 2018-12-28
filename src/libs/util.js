@@ -2,6 +2,7 @@ import Cookies from 'js-cookie'
 // cookie保存的天数
 import config from '@/config'
 import { forEach, hasOneOf, objEqual } from '@/libs/tools'
+import {userLogout} from "../api/user";
 
 export const TOKEN_KEY = 'userInfo'
 
@@ -10,6 +11,7 @@ export const setUserInfo = (token) => {
 }
 
 export const logout = () => {
+  userLogout();
   Cookies.set(TOKEN_KEY, '', {expires: 1});
   window.location.reload();
 }

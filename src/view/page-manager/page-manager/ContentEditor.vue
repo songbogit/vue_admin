@@ -27,13 +27,21 @@
         <!--</div>-->
         <!--模块列表，render显示内容，1：每个模块写对应render，2：数据库保存dom，jquery覆盖对应的字段-->
         <Collapse v-model="collapse" accordion>
-          <Panel :name="'panel'+index" v-for="(item, index) of layouts" :key="">
+          <Panel :name="'panel'+index" v-for="(item, index) of layouts" :key="'panel' + index">
             {{item.title}}
+            <div slot="content" class="cursor" @click="checkBlockHandler(item.id)">
+              <div v-if="item.items && item.items.length">
+
+              </div>
+              <div class="center pt-20 pb-20" v-else>
+                该模块没有内容
+              </div>
+            </div>
           </Panel>
         </Collapse>
       </div>
       <Col span="24" class="pl-20">
-        <div class="bgfff pb-20">
+        <div class="bgfff pb-20" v-if="checkBlockId!==null">
           <div class="pd-15 borderB clear">
             <span class="pt-10 inline-block">模块数据内容</span>
             <span class="ml-40">[名称：大图/类型：轮播图模块]</span>
@@ -47,24 +55,25 @@
           <div class="pl-15 pr-15">
             <Tabs type="card" class="mt-20">
               <TabPane label="模块">
-                <Table :columns="module_col" :data="module_list" :show-header="false"></Table>
+                <Table :columns="content_col" :data="content_list" :show-header="false"></Table>
                 <div class="t-right mt20">
-                  <Page :current="modulePage.current" :total="modulePage.total" :page-size="modulePage.pageSize"
-                        @on-change="pageChange" @on-page-size-change="pageSizeChange" :page-size-opts="[10,20]"
+                  <Page :current="content_page.pageNum" :total="content_page.total" :page-size="content_page.pageSize"
+                        @on-change="contentPageChange" @on-page-size-change="contentPageSizeChange" :page-size-opts="[10,20]"
                         size="small" show-total show-elevator show-sizer></Page>
                 </div>
               </TabPane>
               <TabPane label="关键字">
-                <Table :columns="module_col" :data="module_list" :show-header="false"></Table>
+                <Table :columns="keyword_col" :data="keyword_list" :show-header="false"></Table>
                 <div class="t-right mt20">
-                  <Page :current="modulePage.current" :total="modulePage.total" :page-size="modulePage.pageSize"
-                        @on-change="pageChange" @on-page-size-change="pageSizeChange" :page-size-opts="[10,20]"
+                  <Page :current="keyword_page.pageNum" :total="keyword_page.total" :page-size="keyword_page.pageSize"
+                        @on-change="keyPageChange" @on-page-size-change="keyPageSizeChange" :page-size-opts="[10,20]"
                         size="small" show-total show-elevator show-sizer></Page>
                 </div>
               </TabPane>
             </Tabs>
           </div>
         </div>
+        <div v-else class="center bgfff pt-30 pb-30">请选择点击左侧模块内容区域查看模块详情</div>
       </Col>
     </Row>
     <ModalUtil ref="create" title="创建内容" :loading="loading">
@@ -82,8 +91,8 @@
         <SearchItem><Button type="primary">重置检索</Button></SearchItem>
         <SearchItem><Button type="primary">查看推荐内容</Button></SearchItem>
         <Table class="un-border" :columns="search_col" :data="search_list" :show-header="false"></Table>
-        <Page class="mt10" :current="searchPage.current" :total="searchPage.total" :page-size="searchPage.pageSize"
-              @on-change="pageChange" @on-page-size-change="pageSizeChange" :page-size-opts="[10,20]"
+        <Page class="mt10" :current="search_page.pageNum" :total="search_page.total" :page-size="search_page.pageSize"
+              @on-change="searchPageChange" @on-page-size-change="searchPageSizeChange" :page-size-opts="[10,20]"
               size="small" show-total show-elevator show-sizer></Page>
       </div>
     </ModalUtil>
@@ -95,16 +104,16 @@
 </template>
 
 <script>
-  import { getBlockContent, getPageDetail } from "../../../api/page_template";
+  import { getBlockContentDetail, getPageDetail, getContentList } from "../../../api/page_template";
 
   export default {
     name: "ContentEditor",
     data() {
       return {
-        layouts: [],
         showSpin: false,
         loading: false,
-        module_col: [
+        // 内容检索数据
+        search_col: [
           {
             type: 'selection',
             width: 40,
@@ -204,13 +213,19 @@
             }
           }
         ],
-        modulePage: {
-          current: 1,
+        search_page: {
+          pageNum: 1,
           total: 0,
           pageSize: 10
         },
-        module_list: [{}, {}],
-        search_col: [
+        search_list: [],
+        // 模块关键字数据
+        keyword_col: [
+          {
+            type: 'selection',
+            width: 40,
+            align: 'center'
+          },
           {
             render: (h, params) => {
               const props = {type: 'dashed', size: 'small'};
@@ -250,6 +265,14 @@
                       'mb-5': true
                     }
                   }, '头条小程序预计明年中旬正式公测'),
+                  h('p', {
+                    class: {
+                      'cl-dec': true,
+                      'mb-5': true,
+                      line2: true
+                    }
+                  }, '继微信、支付宝、百度后，头条正式宣布研发小程序，并已进入内测阶段，预计明年九月份正式公测，' +
+                    '集抖音、头条等九大流量，更具宣传力。九大流量入口将使头条小程序的广告无处不在，让用户更容易发现。'),
                   h('div', [
                     h('Button', {
                       props: props,
@@ -280,27 +303,177 @@
 
                     }
                   }
-                }, '编辑')
+                }, '编辑'),
+                h('Button', {
+                  props: {
+                    type: 'error',
+                    size: 'small'
+                  },
+                  class: classes,
+                  on: {
+                    click: () => {
+
+                    }
+                  }
+                }, '删除')
               ])
             }
           }
         ],
-        searchPage: {
-          current: 1,
+        keyword_page: {
+          pageNum: 1,
           total: 0,
           pageSize: 10
         },
-        search_list: [{}, {}],
+        keyword_list: [],
+        // 模块内容数据
+        content_col: [
+          {
+            type: 'selection',
+            width: 40,
+            align: 'center'
+          },
+          {
+            render: (h, params) => {
+              const props = {type: 'dashed', size: 'small'};
+              const classes = {'mr-5': true};
+              return h('div',{
+                class: {
+                  clear: true,
+                  'mt-10': true,
+                  'mb-10': true,
+                  relative: true
+                }
+              },[
+                h('img', {
+                  class: {
+                    left: true,
+                    block: true,
+                    'h60': true,
+                    'w100': true,
+                    'img-col': true
+                  },
+                  domProps: {
+                    src: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4127978443,3621625360&fm=111&gp=0.jpg'
+                  }
+                }),
+                h('div', {
+                  class: {
+                    left: true,
+                    ml10: true,
+                    'content-col': true
+                  }
+                },[
+                  h('p', {
+                    class: {
+                      bold: true,
+                      fs14: true,
+                      line: true,
+                      'mb-5': true
+                    }
+                  }, '头条小程序预计明年中旬正式公测'),
+                  h('p', {
+                    class: {
+                      'cl-dec': true,
+                      'mb-5': true,
+                      line2: true
+                    }
+                  }, '继微信、支付宝、百度后，头条正式宣布研发小程序，并已进入内测阶段，预计明年九月份正式公测，' +
+                    '集抖音、头条等九大流量，更具宣传力。九大流量入口将使头条小程序的广告无处不在，让用户更容易发现。'),
+                  h('div', [
+                    h('Button', {
+                      props: props,
+                      class: classes
+                    },'2018-11-20 18:53:11')
+                  ])
+                ])
+              ])
+            }
+          },
+          {
+            title: '操作',
+            key: 'action',
+            width: 120,
+            align: 'center',
+            render: (h, params) => {
+              const props = {size: 'small'};
+              const classes = {'mr-5': true};
+              return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  class: classes,
+                  on: {
+                    click: () => {
+
+                    }
+                  }
+                }, '编辑'),
+                h('Button', {
+                  props: {
+                    type: 'error',
+                    size: 'small'
+                  },
+                  class: classes,
+                  on: {
+                    click: () => {
+
+                    }
+                  }
+                }, '删除')
+              ])
+            }
+          }
+        ],
+        content_page: {
+          pageNum: 1,
+          total: 0,
+          pageSize: 10
+        },
+        content_list: [],
+        // 创建内容数据
         createModel: {
           title: null,
-          subTitle: null,
-          desc: null,
+          sub_title: null,
+          description: null,
           tags: null,
           type: [],
-          img: [],
+          image: [],
+          image_cdn: '',
           leftTitle: null,
           role: 0,
           state: 1
+        },
+        entity: {
+          "ad_id": "string",
+          "author": "string",
+          "configid": 0,
+          "description": "string",
+          "image": "string",
+          "image_cdn": "string",
+          "imgmark_lb_text": "string",
+          "imgmark_lt_text": "string",
+          "imgmark_rb_text": "string",
+          "imgmark_rt_text": "string",
+          "instanceid": 0,
+          "is_ad": 0,
+          "is_draft": 0,
+          "is_publish": 0,
+          "is_top": 0,
+          "meta": {},
+          "permission": 0,
+          "publish_datetime": "2018-12-28T08:07:57.014Z",
+          "sort": 0,
+          "source": "string",
+          "sub_title": "string",
+          "tags": "string",
+          "title": "string",
+          "top_deadline": "2018-12-28T08:07:57.014Z",
+          "url": "string",
+          "video_length": "string",
+          "vtype": 0
         },
         createRule: {
 
@@ -309,42 +482,81 @@
           {compName: 'Input', label: '主标题：', value: 'title', placeholder: '主标题'},
           {compName: 'Input', label: '副标题：', value: 'subTitle', placeholder: '副标题'},
           {compName: 'Input', label: '简介：', value: 'desc', type: 'textarea', placeholder: '简介'},
-          {compName: 'Input', label: '标签：', value: 'tags', placeholder: '请选择标签'},
+          {compName: 'Select', label: '标签：', value: 'tags', mutiple: true, list:[], placeholder: '请选择标签'},
           {compName: 'Select', label: '内容类型：', value: 'type', list: [], placeholder: '内容类型'},
-          {compName: 'upload', label: '展示图片：', value: 'img'},
+          {compName: 'upload', label: '展示图片：', value: 'image'},
           {compName: 'Input', label: '左上角标文字：', value: 'leftTitle', placeholder: '左上角标文字'},
           {compName: 'RadioGroup', label: '浏览权限：', value: 'role', list: [{label: '所有用户', value: 0}, {label: '仅限会员', value: 1}]},
           {compName: 'RadioGroup', label: '硬件状态：', value: 'state', list: [{label: '发布', value: 0}, {label: '草稿', value: 1}]},
         ],
+        collapse: 'panel0',
         contents: [], // 模块的内容
         keyWords: [], // 模块关键字
-        collapse: 'panel0',
         allContents: [], // 查询到的内容
+        checkBlockId: null, // 选中的模块id
+        layouts: [],
       }
     },
     computed: {
       editId() {
         return Number(this.$store.state.page.editContentId);
-      }
+      },
+      // checkBlockId() {
+      //
+      // },
+      // blockDetail() {
+      //   if (this.checkBlockIndex !== null) {
+      //
+      //   } else {
+      //     return {
+      //       contents: [],
+      //       keyWords: []
+      //     }
+      //   }
+      // }
     },
     methods: {
-      pageChange(current) {
+      checkBlockHandler(id) {
+        if (id != this.checkBlockId) {
+          this.checkBlockId = id;
+        }
+      },
+      // 模块内容分页
+      contentPageChange(current) {
 
       },
-      pageSizeChange(pageSize) {
+      contentPageSizeChange(pageSize) {
 
       },
-      // 获取页面模块内容
-      getBlockContent() {
-        this.showSpin = true;
-        getBlockContent({
-          id: this.editId
+      // 模块关键字分页
+      keyPageChange(current) {
+
+      },
+      keyPageSizeChange(pageSize) {
+
+      },
+      // 内容检索分页
+      searchPageChange(current) {
+
+      },
+      searchPageSizeChange(pageSize) {
+
+      },
+      // 获取模块的所有内容和关键字
+      getBlockContents(stype) {
+        const {pageNum, pageSize} = stype==0?this.content_page:this.keyword_page;
+        getContentList({
+          stype: stype,
+          pageNum: pageNum,
+          pageSize: pageSize,
+          config_id: this.checkBlockId
         }).then(res => {
-          this.showSpin = false;
+
         }).catch(res => {
-          this.showSpin = false;
+
         })
       },
+
       //  获取页面模块
       getPageDetail() {
         this.showSpin = true;
@@ -358,6 +570,14 @@
           this.showSpin = false
         })
       },
+    },
+    watch: {
+      checkBlockId() {
+        this.contents = [];
+        this.keyWords = [];
+        this.getBlockContents(0);
+        this.getBlockContents(1);
+      }
     },
     mounted() {
       this.$refs['create'].toggleShow();
