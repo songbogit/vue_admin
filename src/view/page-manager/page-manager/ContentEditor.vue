@@ -29,7 +29,7 @@
         <Collapse v-model="collapse" accordion>
           <Panel :name="'panel'+index" v-for="(item, index) of layouts" :key="'panel' + index">
             {{item.title}}
-            <div slot="content" class="cursor" @click="checkBlockHandler(item.id)">
+            <div slot="content" class="cursor" @click="checkBlockHandler(item.id, item.title)">
               <div v-if="item.items && item.items.length">
 
               </div>
@@ -44,17 +44,17 @@
         <div class="bgfff pb-20" v-if="checkBlockId!==null">
           <div class="pd-15 borderB clear">
             <span class="pt-10 inline-block">模块数据内容</span>
-            <span class="ml-40">[名称：大图/类型：轮播图模块]</span>
+            <span class="ml-40">[名称：{{checkBlockTitle}}]</span>
             <div class="right pr-30">
-              <Button class="ml-15" icon="md-add" type="primary">新增内容</Button>
+              <Button class="ml-15" icon="md-add" type="primary" @click="showAddContent">新增内容</Button>
               <Button class="ml-15" icon="md-search" type="primary">从数据库中检索</Button>
               <Button class="ml-15" shape="circle" icon="ios-refresh"></Button>
               <Button class="ml-15" shape="circle" icon="ios-search"></Button>
             </div>
           </div>
           <div class="pl-15 pr-15">
-            <Tabs type="card" class="mt-20">
-              <TabPane label="模块">
+            <Tabs type="card" class="mt-20" v-model="stype">
+              <TabPane label="模块" :name="0">
                 <Table :columns="content_col" :data="content_list" :show-header="false"></Table>
                 <div class="t-right mt20">
                   <Page :current="content_page.pageNum" :total="content_page.total" :page-size="content_page.pageSize"
@@ -62,7 +62,7 @@
                         size="small" show-total show-elevator show-sizer></Page>
                 </div>
               </TabPane>
-              <TabPane label="关键字">
+              <TabPane label="关键字" :name="1">
                 <Table :columns="keyword_col" :data="keyword_list" :show-header="false"></Table>
                 <div class="t-right mt20">
                   <Page :current="keyword_page.pageNum" :total="keyword_page.total" :page-size="keyword_page.pageSize"
@@ -71,13 +71,17 @@
                 </div>
               </TabPane>
             </Tabs>
+            <Spin fix v-if="showRightSpin">
+              <Icon type="ios-loading" size=18 class="spin-icon-load"></Icon>
+              <div>Loading</div>
+            </Spin>
           </div>
         </div>
         <div v-else class="center bgfff pt-30 pb-30">请选择点击左侧模块内容区域查看模块详情</div>
       </Col>
     </Row>
-    <ModalUtil ref="create" title="创建内容" :loading="loading">
-      <FormUtil :model="createModel" :rules="createRule" :comp="createComp"></FormUtil>
+    <ModalUtil ref="create" title="创建内容" :loading="loading" @on-ok="okHandler" @reset="resetAddContent">
+      <FormUtil ref="createModel" :model="createModel" :rules="createRule" :comp="createComp" @on-submit="createSubmit"></FormUtil>
     </ModalUtil>
     <ModalUtil ref="search" title="从数据库中检索" :width="800" :footerHide="true">
       <div>
@@ -104,13 +108,15 @@
 </template>
 
 <script>
-  import { getBlockContentDetail, getPageDetail, getContentList } from "../../../api/page_template";
+  import { getBlockContentDetail, getPageDetail, getContentList, addBlockContent } from "../../../api/page_template";
+  import {imgBaseUrl} from "../../../config";
 
   export default {
     name: "ContentEditor",
     data() {
       return {
         showSpin: false,
+        showRightSpin: false,
         loading: false,
         // 内容检索数据
         search_col: [
@@ -336,6 +342,7 @@
           {
             render: (h, params) => {
               const props = {type: 'dashed', size: 'small'};
+              const {image, description, title, update_datetime} = params.row;
               const classes = {'mr-5': true};
               return h('div',{
                 class: {
@@ -354,7 +361,7 @@
                     'img-col': true
                   },
                   domProps: {
-                    src: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4127978443,3621625360&fm=111&gp=0.jpg'
+                    src: imgBaseUrl + image
                   }
                 }),
                 h('div', {
@@ -371,20 +378,19 @@
                       line: true,
                       'mb-5': true
                     }
-                  }, '头条小程序预计明年中旬正式公测'),
+                  }, title),
                   h('p', {
                     class: {
                       'cl-dec': true,
                       'mb-5': true,
                       line2: true
                     }
-                  }, '继微信、支付宝、百度后，头条正式宣布研发小程序，并已进入内测阶段，预计明年九月份正式公测，' +
-                    '集抖音、头条等九大流量，更具宣传力。九大流量入口将使头条小程序的广告无处不在，让用户更容易发现。'),
+                  }, description),
                   h('div', [
                     h('Button', {
                       props: props,
                       class: classes
-                    },'2018-11-20 18:53:11')
+                    }, update_datetime)
                   ])
                 ])
               ])
@@ -439,41 +445,58 @@
           sub_title: null,
           description: null,
           tags: null,
-          type: [],
           image: [],
           image_cdn: '',
-          leftTitle: null,
-          role: 0,
-          state: 1
+          permission: 0,
+          vtype: 1,
+          ad_id: "",
+          author: "",
+          configid: 0,
+          imgmark_lb_text: "",
+          imgmark_lt_text: "",
+          imgmark_rb_text: "",
+          imgmark_rt_text: "",
+          instanceid: 0,
+          is_ad: 0,
+          is_draft: 0, // 内容状态 0为草稿
+          is_publish: 0,
+          is_top: 0,
+          meta: {},
+          // publish_datetime: null,
+          sort: 0,
+          source: "",
+          top_deadline: "",
+          url: "string",
+          video_length: "",
         },
         entity: {
-          "ad_id": "string",
-          "author": "string",
-          "configid": 0,
-          "description": "string",
-          "image": "string",
-          "image_cdn": "string",
-          "imgmark_lb_text": "string",
-          "imgmark_lt_text": "string",
-          "imgmark_rb_text": "string",
-          "imgmark_rt_text": "string",
-          "instanceid": 0,
-          "is_ad": 0,
-          "is_draft": 0,
-          "is_publish": 0,
-          "is_top": 0,
-          "meta": {},
-          "permission": 0,
-          "publish_datetime": "2018-12-28T08:07:57.014Z",
-          "sort": 0,
-          "source": "string",
-          "sub_title": "string",
-          "tags": "string",
-          "title": "string",
-          "top_deadline": "2018-12-28T08:07:57.014Z",
-          "url": "string",
-          "video_length": "string",
-          "vtype": 0
+          ad_id: "",
+          author: "",
+          configid: 0,
+          description: "",
+          image: "",
+          image_cdn: "",
+          imgmark_lb_text: "",
+          imgmark_lt_text: "",
+          imgmark_rb_text: "",
+          imgmark_rt_text: "",
+          instanceid: 0,
+          is_ad: 0,
+          is_draft: 0,
+          is_publish: 0,
+          is_top: 0,
+          meta: {},
+          permission: 0,
+          publish_datetime: null,
+          sort: 0,
+          source: "",
+          sub_title: "",
+          tags: "",
+          title: "",
+          top_deadline: "",
+          url: "string",
+          video_length: "",
+          vtype: 0
         },
         createRule: {
 
@@ -481,20 +504,22 @@
         createComp: [
           {compName: 'Input', label: '主标题：', value: 'title', placeholder: '主标题'},
           {compName: 'Input', label: '副标题：', value: 'subTitle', placeholder: '副标题'},
-          {compName: 'Input', label: '简介：', value: 'desc', type: 'textarea', placeholder: '简介'},
+          {compName: 'Input', label: '简介：', value: 'description', type: 'textarea', placeholder: '简介'},
           {compName: 'Select', label: '标签：', value: 'tags', mutiple: true, list:[], placeholder: '请选择标签'},
-          {compName: 'Select', label: '内容类型：', value: 'type', list: [], placeholder: '内容类型'},
+          // {compName: 'Select', label: '内容类型：', value: 'type', list: [], placeholder: '内容类型'},
           {compName: 'upload', label: '展示图片：', value: 'image'},
-          {compName: 'Input', label: '左上角标文字：', value: 'leftTitle', placeholder: '左上角标文字'},
-          {compName: 'RadioGroup', label: '浏览权限：', value: 'role', list: [{label: '所有用户', value: 0}, {label: '仅限会员', value: 1}]},
-          {compName: 'RadioGroup', label: '硬件状态：', value: 'state', list: [{label: '发布', value: 0}, {label: '草稿', value: 1}]},
+          {compName: 'Input', label: '左上角标文字：', value: 'imgmark_lt_text', placeholder: '左上角标文字'},
+          {compName: 'RadioGroup', label: '浏览权限：', value: 'permission', list: [{label: '所有用户', value: 0}, {label: '仅限会员', value: 1}]},
+          {compName: 'RadioGroup', label: '内容状态：', value: 'is_draft', list: [{label: '发布', value: 0}, {label: '草稿', value: 1}]},
         ],
         collapse: 'panel0',
         contents: [], // 模块的内容
         keyWords: [], // 模块关键字
         allContents: [], // 查询到的内容
         checkBlockId: null, // 选中的模块id
+        checkBlockTitle: null, // 选中的模块title
         layouts: [],
+        stype: 0
       }
     },
     computed: {
@@ -516,24 +541,63 @@
       // }
     },
     methods: {
-      checkBlockHandler(id) {
+      showAddContent() {
+        this.$refs['create'].toggleShow();
+      },
+      resetAddContent() {
+        this.createModel = {
+          title: null,
+          sub_title: null,
+          description: null,
+          tags: null,
+          image: [],
+          image_cdn: '',
+          permission: 0,
+          vtype: 1,
+          ad_id: "",
+          author: "",
+          configid: 0,
+          imgmark_lb_text: "",
+          imgmark_lt_text: "",
+          imgmark_rb_text: "",
+          imgmark_rt_text: "",
+          instanceid: 0,
+          is_ad: 0,
+          is_draft: 0,
+          is_publish: 0,
+          is_top: 0,
+          meta: {},
+          // publish_datetime: null,
+          sort: 0,
+          source: "",
+          top_deadline: "",
+          url: "string",
+          video_length: "",
+        }
+      },
+      checkBlockHandler(id, title) {
         if (id != this.checkBlockId) {
           this.checkBlockId = id;
+          this.checkBlockTitle = title;
         }
       },
       // 模块内容分页
       contentPageChange(current) {
-
+        this.content_page.pageNum = current;
+        this.getBlockContents(0);
       },
       contentPageSizeChange(pageSize) {
-
+        this.content_page.pageSize = pageSize;
+        this.getBlockContents(0);
       },
       // 模块关键字分页
       keyPageChange(current) {
-
+        this.keyword_page.pageNum = current;
+        this.getBlockContents(1);
       },
       keyPageSizeChange(pageSize) {
-
+        this.keyword_page.pageSize = pageSize;
+        this.getBlockContents(1);
       },
       // 内容检索分页
       searchPageChange(current) {
@@ -544,19 +608,48 @@
       },
       // 获取模块的所有内容和关键字
       getBlockContents(stype) {
-        const {pageNum, pageSize} = stype==0?this.content_page:this.keyword_page;
+        const {pageNum, pageSize} = stype==0?this.content_page:this.keyword_page
+        this.showRightSpin = true;
         getContentList({
           stype: stype,
           pageNum: pageNum,
           pageSize: pageSize,
           config_id: this.checkBlockId
         }).then(res => {
-
+          this.showRightSpin = false;
+          if (res.code == 200) {
+            const data = res.data
+            const {list} = data || {};
+            if (stype == 0) {
+              this.content_list = list? list.list||[]:[];
+              this.content_page.total = list? list.total:0;
+            }
+          }
         }).catch(res => {
-
+          this.showRightSpin = false;
         })
       },
-
+      // 创建内容
+      okHandler() {
+        this.$refs['createModel'].submit();
+      },
+      createSubmit(entity) {
+        const params = JSON.parse(JSON.stringify(entity));
+        params.image = params.image[0] || '';
+        params.image_cdn = params.image;
+        params.configid = this.checkBlockId;
+        params.instanceid = this.editId;
+        params.stype = this.stype;
+        this.loading = true;
+        addBlockContent(params).then(res => {
+          this.loading = false;
+          if (res.code == 200) {
+            this.showAddContent();
+          }
+        }).catch(res => {
+          this.loading = false;
+        })
+      },
       //  获取页面模块
       getPageDetail() {
         this.showSpin = true;
@@ -578,9 +671,6 @@
         this.getBlockContents(0);
         this.getBlockContents(1);
       }
-    },
-    mounted() {
-      this.$refs['create'].toggleShow();
     },
     created() {
       if (!this.editId) {

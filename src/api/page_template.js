@@ -101,10 +101,16 @@ export const updatePage = (params) => {
 /**
  * 页面内容编辑
  */
+// 添加页面模块内容
+export const addBlockContent = (params) => {
+  return postJson('/page/dataSource/create', params);
+}
+
 // 获取模块内容详情
 export const getBlockContentDetail = (params) => {
   return getRequest('/page/dataSource/getById', params);
 }
+
 // 获取模块的内容或关键字列表
 export const getContentList = (params) => {
   return getRequest('/page/dataSource/list', params);
