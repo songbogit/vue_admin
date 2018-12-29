@@ -116,3 +116,17 @@ export const getContentList = (params) => {
   return getRequest('/page/dataSource/list', params);
 }
 
+// 保存模块内容列表状态
+export const saveConentStatus = (params) => {
+  return postJson('/page/dataSource/saveDataSourceConfirm', params);
+}
+
+// 删除模块内容
+export const deleteBlockContent = (params) => {
+  return getRequest('/page/dataSource/deleteById', params);
+}
+
+// 更新内容
+export const updateBlockContent = (params) => {
+  return postJson('/page/dataSource/update', params);
+}

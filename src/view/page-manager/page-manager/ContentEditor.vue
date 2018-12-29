@@ -48,26 +48,32 @@
             <div class="right pr-30">
               <Button class="ml-15" icon="md-add" type="primary" @click="showAddContent">新增内容</Button>
               <Button class="ml-15" icon="md-search" type="primary">从数据库中检索</Button>
-              <Button class="ml-15" shape="circle" icon="ios-refresh"></Button>
-              <Button class="ml-15" shape="circle" icon="ios-search"></Button>
+              <Button class="ml-15" shape="circle" icon="ios-refresh" @click="getBlockContents"></Button>
+              <!--<Button class="ml-15" shape="circle" icon="ios-search"></Button>-->
             </div>
           </div>
           <div class="pl-15 pr-15">
             <Tabs type="card" class="mt-20" v-model="stype">
-              <TabPane label="模块" :name="0">
-                <Table :columns="content_col" :data="content_list" :show-header="false"></Table>
+              <TabPane label="模块" name="0">
+                <Table :columns="content_col" :data="content_list" :show-header="true"></Table>
                 <div class="t-right mt20">
                   <Page :current="content_page.pageNum" :total="content_page.total" :page-size="content_page.pageSize"
                         @on-change="contentPageChange" @on-page-size-change="contentPageSizeChange" :page-size-opts="[10,20]"
                         size="small" show-total show-elevator show-sizer></Page>
                 </div>
+                <div class="mt10">
+                  <Button type="primary" @click="saveContents">保存</Button>
+                </div>
               </TabPane>
-              <TabPane label="关键字" :name="1">
-                <Table :columns="keyword_col" :data="keyword_list" :show-header="false"></Table>
+              <TabPane label="关键字" name="1">
+                <Table :columns="keyword_col" :data="keyword_list" :show-header="true"></Table>
                 <div class="t-right mt20">
                   <Page :current="keyword_page.pageNum" :total="keyword_page.total" :page-size="keyword_page.pageSize"
                         @on-change="keyPageChange" @on-page-size-change="keyPageSizeChange" :page-size-opts="[10,20]"
                         size="small" show-total show-elevator show-sizer></Page>
+                </div>
+                <div class="mt10">
+                  <Button type="primary" @click="saveContents">保存</Button>
                 </div>
               </TabPane>
             </Tabs>
@@ -80,7 +86,7 @@
         <div v-else class="center bgfff pt-30 pb-30">请选择点击左侧模块内容区域查看模块详情</div>
       </Col>
     </Row>
-    <ModalUtil ref="create" title="创建内容" :loading="loading" @on-ok="okHandler" @reset="resetAddContent">
+    <ModalUtil ref="create" :title="createModel.id?'编辑':'创建'" :loading="loading" @on-ok="okHandler" @reset="resetAddContent">
       <FormUtil ref="createModel" :model="createModel" :rules="createRule" :comp="createComp" @on-submit="createSubmit"></FormUtil>
     </ModalUtil>
     <ModalUtil ref="search" title="从数据库中检索" :width="800" :footerHide="true">
@@ -108,7 +114,11 @@
 </template>
 
 <script>
-  import { getBlockContentDetail, getPageDetail, getContentList, addBlockContent } from "../../../api/page_template";
+  import {
+    getBlockContentDetail, getPageDetail, getContentList,
+    addBlockContent, saveConentStatus, deleteBlockContent,
+    updateBlockContent
+  } from "../../../api/page_template";
   import {imgBaseUrl} from "../../../config";
 
   export default {
@@ -228,11 +238,24 @@
         // 模块关键字数据
         keyword_col: [
           {
-            type: 'selection',
-            width: 40,
-            align: 'center'
+            title: '是否为草稿',
+            width: 80,
+            align: 'center',
+            render: (h, params) => {
+              return h('Checkbox', {
+                props: {
+                  value: params.row.checked
+                },
+                on: {
+                  'on-change': (event) => {
+                    this.keyword_list[event.index].checked = !this.keyword_list[event.index].checked;
+                  }
+                }
+              })
+            }
           },
           {
+            title: '详情',
             render: (h, params) => {
               const props = {type: 'dashed', size: 'small'};
               const classes = {'mr-5': true};
@@ -306,7 +329,7 @@
                   class: classes,
                   on: {
                     click: () => {
-
+                      this.getContentDetail(params.row.id);
                     }
                   }
                 }, '编辑'),
@@ -318,7 +341,7 @@
                   class: classes,
                   on: {
                     click: () => {
-
+                      this.deleteContentById(params.row.id);
                     }
                   }
                 }, '删除')
@@ -335,11 +358,25 @@
         // 模块内容数据
         content_col: [
           {
-            type: 'selection',
-            width: 40,
-            align: 'center'
+            title: '是否为草稿',
+            width: 80,
+            align: 'center',
+            render: (h, params) => {
+              return h('Checkbox', {
+                props: {
+                  value: params.row.checked
+                },
+                on: {
+                  'on-change': (event) => {
+                    console.log(event);
+                    this.content_list[params.index].checked = event;
+                  }
+                }
+              })
+            }
           },
           {
+            title: '详情',
             render: (h, params) => {
               const props = {type: 'dashed', size: 'small'};
               const {image, description, title, update_datetime} = params.row;
@@ -413,7 +450,7 @@
                   class: classes,
                   on: {
                     click: () => {
-
+                      this.getContentDetail(params.row.id);
                     }
                   }
                 }, '编辑'),
@@ -425,7 +462,7 @@
                   class: classes,
                   on: {
                     click: () => {
-
+                      this.deleteContentById(params.row.id);
                     }
                   }
                 }, '删除')
@@ -451,7 +488,7 @@
           vtype: 1,
           ad_id: "",
           author: "",
-          configid: 0,
+          configid: null,
           imgmark_lb_text: "",
           imgmark_lt_text: "",
           imgmark_rb_text: "",
@@ -466,7 +503,7 @@
           sort: 0,
           source: "",
           top_deadline: "",
-          url: "string",
+          url: "",
           video_length: "",
         },
         entity: {
@@ -503,7 +540,7 @@
         },
         createComp: [
           {compName: 'Input', label: '主标题：', value: 'title', placeholder: '主标题'},
-          {compName: 'Input', label: '副标题：', value: 'subTitle', placeholder: '副标题'},
+          {compName: 'Input', label: '副标题：', value: 'sub_title', placeholder: '副标题'},
           {compName: 'Input', label: '简介：', value: 'description', type: 'textarea', placeholder: '简介'},
           {compName: 'Select', label: '标签：', value: 'tags', mutiple: true, list:[], placeholder: '请选择标签'},
           // {compName: 'Select', label: '内容类型：', value: 'type', list: [], placeholder: '内容类型'},
@@ -519,7 +556,7 @@
         checkBlockId: null, // 选中的模块id
         checkBlockTitle: null, // 选中的模块title
         layouts: [],
-        stype: 0
+        stype: '0'
       }
     },
     computed: {
@@ -581,6 +618,35 @@
           this.checkBlockTitle = title;
         }
       },
+      // 删除
+      deleteContentById(id) {
+        this.showRightSpin = true;
+        deleteBlockContent({id}).then(res => {
+          this.showRightSpin = false;
+          if (res.code == 200) {
+            this.getBlockContents();
+          }
+        }).catch(res => {
+          this.showRightSpin = false;
+        })
+      },
+      // 获取模块详情
+      getContentDetail(id) {
+        this.showRightSpin = true;
+        getBlockContentDetail({id}).then(res => {
+          this.showRightSpin = false;
+          if (res.code == 200) {
+            const data = res.data;
+            data.image = data.image?[data.image]:[];
+            delete data.publish_datetime;
+            delete data.update_datetime;
+            this.createModel = data;
+            this.showAddContent();
+          }
+        }).catch(res => {
+          this.showRightSpin = false;
+        })
+      },
       // 模块内容分页
       contentPageChange(current) {
         this.content_page.pageNum = current;
@@ -606,12 +672,31 @@
       searchPageSizeChange(pageSize) {
 
       },
+      // 保存模块内容
+      saveContents() {
+        const list = this.stype == 0? this.content_list : this.keyword_list;
+        const params = {};
+        list.forEach(item => {
+          params[item.id.toString()] = params.checked?1:0;
+        })
+        this.showRightSpin = true;
+        saveConentStatus({
+          map: params
+        }).then(res => {
+          this.showRightSpin = false;
+          if (res.code == 200) {
+            this.getBlockContents();
+          }
+        }).catch(res => {
+          this.showRightSpin = false;
+        })
+      },
       // 获取模块的所有内容和关键字
       getBlockContents(stype) {
         const {pageNum, pageSize} = stype==0?this.content_page:this.keyword_page
         this.showRightSpin = true;
         getContentList({
-          stype: stype,
+          stype: stype?stype:this.stype,
           pageNum: pageNum,
           pageSize: pageSize,
           config_id: this.checkBlockId
@@ -620,9 +705,16 @@
           if (res.code == 200) {
             const data = res.data
             const {list} = data || {};
+            const contentList = list? list.list||[]:[];
+            contentList.forEach(item => {
+              item.checked = !!item.is_draft;
+            })
             if (stype == 0) {
-              this.content_list = list? list.list||[]:[];
+              this.content_list = contentList;
               this.content_page.total = list? list.total:0;
+            } else {
+              this.keyword_list = contentList;
+              this.keyword_page.total = list? list.total:0;
             }
           }
         }).catch(res => {
@@ -639,12 +731,16 @@
         params.image_cdn = params.image;
         params.configid = this.checkBlockId;
         params.instanceid = this.editId;
-        params.stype = this.stype;
         this.loading = true;
-        addBlockContent(params).then(res => {
+        const handler = params.id?updateBlockContent:addBlockContent;
+        if (!params.id) {
+          params.stype = Number(this.stype);
+        }
+        handler(params).then(res => {
           this.loading = false;
           if (res.code == 200) {
             this.showAddContent();
+            this.getBlockContents();
           }
         }).catch(res => {
           this.loading = false;

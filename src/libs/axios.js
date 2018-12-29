@@ -74,7 +74,10 @@ export const postRequest = (url, params) => {
   return axios({
     method: 'post',
     url: `${base}${url}`,
-    data: stringify(params)
+    data: stringify(params),
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
   })
 }
 
@@ -89,7 +92,3 @@ export const postJson = (url, params) => {
   })
 }
 
-export default {
-  getRequest,
-  postRequest,
-}
