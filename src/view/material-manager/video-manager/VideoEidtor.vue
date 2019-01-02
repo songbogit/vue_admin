@@ -116,7 +116,7 @@
   import {getVideoById} from "../../../api/material";
 
   export default {
-    name: "VideoEidtor",
+    name: "video-edit",
     data() {
       return {
         showSpin: false,

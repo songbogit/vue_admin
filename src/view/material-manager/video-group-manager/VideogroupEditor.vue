@@ -66,7 +66,7 @@
 <script>
   import ManagerView from '@/view/components/global-util/ManagerView';
   export default {
-    name: "VideogroupEditor",
+    name: "video-group-edit",
     components: {
       ManagerView
     },

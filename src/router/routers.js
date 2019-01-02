@@ -73,7 +73,7 @@ export default [
         meta: {
           title: '视频管理',
           icon: 'ios-settings',
-          notCache: true
+          // notCache: true
         },
         component: () => import('@/view/material-manager/video-manager/VideoManager.vue')
       },
@@ -83,7 +83,7 @@ export default [
         meta: {
           title: '视频编目',
           icon: 'ios-settings',
-          notCache: true
+          // notCache: true
         },
         component: () => import('@/view/material-manager/video-manager/VideoEidtor.vue')
       },
@@ -93,7 +93,7 @@ export default [
         meta: {
           title: '视频集管理',
           icon: 'ios-settings',
-          notCache: true
+          // notCache: true
         },
         component: () => import('@/view/material-manager/video-group-manager/VideogroupManager.vue')
       },
@@ -103,7 +103,7 @@ export default [
         meta: {
           title: '视频集编目',
           icon: 'ios-settings',
-          notCache: true
+          // notCache: true
         },
         component: () => import('@/view/material-manager/video-group-manager/VideogroupEditor.vue')
       },
@@ -113,7 +113,7 @@ export default [
         meta: {
           title: '视频集挑选',
           icon: 'ios-settings',
-          notCache: true
+          // notCache: true
         },
         component: () => import('@/view/material-manager/video-group-manager/VideoChoose.vue')
       }
@@ -134,7 +134,7 @@ export default [
         meta: {
           title: '页面管理',
           icon: 'ios-settings',
-          notCache: true
+          // notCache: true
         },
         component: () => import('@/view/page-manager/page-manager/PageManager.vue')
       },
@@ -144,7 +144,7 @@ export default [
         meta: {
           title: '页面编辑',
           icon: 'ios-settings',
-          notCache: true,
+          // notCache: true,
           hideInMenu: true
         },
         component: () => import('@/view/page-manager/page-manager/PageEditor.vue')
@@ -155,7 +155,7 @@ export default [
         meta: {
           title: '内容编辑',
           icon: 'ios-settings',
-          notCache: true,
+          // notCache: true,
           hideInMenu: true
         },
         component: () => import('@/view/page-manager/page-manager/ContentEditor.vue')
@@ -166,7 +166,7 @@ export default [
         meta: {
           title: '模板管理',
           icon: 'ios-settings',
-          notCache: true
+          // notCache: true
         },
         component: () => import('@/view/page-manager/template-manager/TemplateManager.vue')
       },
@@ -176,7 +176,7 @@ export default [
         meta: {
           title: '模板编辑',
           icon: 'ios-settings',
-          notCache: true,
+          // notCache: true,
           hideInMenu: true
         },
         component: () => import('@/view/page-manager/template-manager/TemplateEdit.vue')

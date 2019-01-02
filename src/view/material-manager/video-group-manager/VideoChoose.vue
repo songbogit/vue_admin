@@ -37,7 +37,7 @@
   import DateUtil from '@/view/components/global-util/DateUtil';
   import {getDateTime} from "../../../libs/tools";
   export default {
-    name: "VideoChoose",
+    name: "video-choose",
     components: {
       ManagerView,
       SearchItem,

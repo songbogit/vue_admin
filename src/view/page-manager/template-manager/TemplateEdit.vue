@@ -65,7 +65,7 @@
   import { imgBaseUrl } from "../../../config";
 
   export default {
-    name: "TemplateEdit",
+    name: "template-edit",
     components: {
       ContextMenu
     },

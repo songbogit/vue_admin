@@ -31,7 +31,7 @@
   import {getDateTime} from "../../../libs/tools";
 
   export default {
-    name: "VideogroupManager",
+    name: "video-group-manager",
     data() {
       return {
         save: {

@@ -122,7 +122,7 @@
   import {imgBaseUrl} from "../../../config";
 
   export default {
-    name: "ContentEditor",
+    name: "content-edit",
     data() {
       return {
         showSpin: false,

@@ -31,7 +31,7 @@
   import { pageTemplateList, createTemplate } from "../../../api/page_template";
 
   export default {
-    name: "TemplateManager",
+    name: "template-manager",
     data() {
       return {
         imgBaseUrl: imgBaseUrl,
