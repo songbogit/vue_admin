@@ -11,11 +11,12 @@
           </FormItem>
           <FormItem label="关键字：">
             <div>
-              <Tag color="primary" type="dot">测试回显</Tag><Tag color="primary" type="dot">测试</Tag>
+              <!--<Tag color="primary" type="dot">测试回显</Tag><Tag color="primary" type="dot">测试</Tag>-->
+              <Tag color="primary" type="dot" v-for="(item, index) of keys" :key="'key'+index">{{item}}</Tag>
             </div>
-            <div class="mt-5">
-              <Input class="w300" @keyup.enter=""/>
-              <Button type="primary" class="ml-5">添加关键字</Button>
+            <div>
+              <Input class="w300" v-model="key" @on-enter="addKey"/>
+              <Button type="primary" class="ml5" @click="addKey">添加关键字</Button>
             </div>
             <p>关键字可输入多个</p>
           </FormItem>
@@ -35,10 +36,10 @@
             <Input  class="w300"/>
           </FormItem>
           <FormItem label="主持人：">
-            <Input  class="w300"/>
+            <Input  class="w300" v-model="entity.host"/>
           </FormItem>
           <FormItem label="重播时间：">
-            <DatePicker class="w300" placeholder="请选择"></DatePicker>
+            <DatePicker class="w300" placeholder="请选择" v-model="entity.replayTime"></DatePicker>
           </FormItem>
           <FormItem label="媒体属性：">
             <Input  class="w300"/>
@@ -81,7 +82,7 @@
             <Select class="w300" placeholder="请选择"></Select>
           </FormItem>
           <FormItem label="首播时间：">
-            <DatePicker class="w300" placeholder="请选择"></DatePicker>
+            <DatePicker class="w300" placeholder="请选择" v-model="entity.playTime"></DatePicker>
           </FormItem>
           <FormItem label="重播频道：">
             <Select class="w300" placeholder="请选择"></Select>
@@ -94,11 +95,12 @@
           </FormItem>
           <FormItem label="标签：">
             <div>
-              <Tag color="primary" type="dot">测试回显</Tag><Tag color="primary" type="dot">测试</Tag>
+              <!--<Tag color="primary" type="dot">测试回显</Tag><Tag color="primary" type="dot">测试</Tag>-->
+              <Tag color="primary" type="dot" v-for="(item, index) of tags" :key="'tag'+index">{{item}}</Tag>
             </div>
-            <div class="mt-5">
-              <Input class="w300" @keyup.enter=""/>
-              <Button type="primary" class="ml-5">添加标签</Button>
+            <div>
+              <Input class="w300" v-model="tag" @on-enter="addTag"/>
+              <Button type="primary" class="ml-5" @click="addTag">添加标签</Button>
             </div>
             <p>标签可输入多个</p>
           </FormItem>
@@ -106,14 +108,15 @@
       </Row>
     </Form>
     <div class="center">
-      <Button type="primary" class="w200 mt-20">提交</Button>
+      <Button type="primary" class="w200 mt-20" @click="addVideo">提交</Button>
     </div>
     <SpinUtil :show="showSpin"></SpinUtil>
   </Card>
 </template>
 
 <script>
-  import {getVideoById} from "../../../api/material";
+  import {getVideoById, addVideo} from "../../../api/material";
+  import {getDateTime} from "../../../libs/tools";
 
   export default {
     name: "video-edit",
@@ -123,22 +126,28 @@
         entity: {
           title: '', // 标题
           keywords: '', // 关键字
-          cataloging_status: '', // 编目状态
-          photo_url: '', // 封面地址
+          catalogingStatus: '', // 编目状态
+          photoUrl: '', // 封面地址
           column: '', // 栏目
           host: '', // 主持人
-          play_time: null, // 首播时间
-          replay_time: null, // 重播时间
-          content_brief: '', // 内容概要
+          playTime: null, // 首播时间
+          replayTime: null, // 重播时间
+          inputTime: null, // 视频入cms时间
+          cmsUpdateTime: null,
+          contentBrief: '', // 内容概要
           content: '', // 内容
           channel: '', // 直播频道
-          synchronized_channel: '', // 同步直播频道
-          core_tags: '', // 标签
-          content_guid: '', //GUID
+          synchronizedChannel: '', // 同步直播频道
+          coreTags: '', // 标签
+          contentGuid: '', //GUID
           guests: '', // 嘉宾
           main_set: '', // 主视频集
-          web_url: '', // 视频web地址
+          webUrl: '', // 视频web地址,
+          description: '', // 简介
+
         },
+        tag: '',
+        key: '',
         rules: {
 
         }
@@ -147,9 +156,49 @@
     computed: {
       editId() {
         return this.$store.state.material.videoEditId;
+      },
+      tags() {
+        const tags = this.entity.coreTags;
+        return tags ? tags.split(',') : [];
+      },
+      keys() {
+        const keys = this.entity.keywords;
+        return keys ? keys.split(',') : [];
       }
     },
     methods: {
+      addTag() {
+        if (this.tag.trim()) {
+          const tags = this.entity.coreTags;
+          this.entity.coreTags = tags ? tags + `,${this.tag.trim()}` : this.tag.trim();
+          this.tag = '';
+        }
+      },
+      addKey() {
+        const key = this.key.trim();
+        if (key) {
+          const keys = this.entity.keywords;
+          this.entity.keywords = keys ? keys + `,${key}` : key;
+          this.key = '';
+        }
+      },
+      // 添加视频
+      addVideo() {
+        const params = JSON.parse(JSON.stringify(this.entity));
+        params.keywords = this.keys.join(',');
+        params.coreTags = this.tags.join(',');
+        params.playTime = getDateTime(params.playTime);
+        params.replayTime = getDateTime(params.replayTime);
+        params.inputTime = getDateTime(new Date());
+        params.cmsUpdateTime = getDateTime(new Date());
+        this.showSpin = true;
+        addVideo(params).then(res => {
+          this.showSpin = false;
+        }).catch(res => {
+          this.showSpin = false;
+        })
+      },
+      // 获取视频详情
       getVideoDetail() {
         this.showSpin = true;
         getVideoById({id: this.editId}).then(res => {
@@ -161,10 +210,10 @@
     },
     mounted() {
       if (this.editId) {
-        document.title = '添加视频';
+        document.title = '编辑视频';
         this.getVideoDetail();
       } else {
-        document.title = '编辑视频';
+        document.title = '添加视频';
       }
     }
   }

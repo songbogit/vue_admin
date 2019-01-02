@@ -1,8 +1,8 @@
 <template>
   <Card>
     <div>
-      <SearchItem>标题：<Input placeholder="请输入标题" class="w200"/></SearchItem>
-      <DateUtil title="发布时间：" :startTime="searchData.createTimeStart" :endTime="searchData.createTimeEnd" @change="change"></DateUtil>
+      <SearchItem>标题：<Input placeholder="请输入标题" class="w200" v-model="searchData.title"/></SearchItem>
+      <DateUtil title="发布时间：" :startTime="searchData.startTime" :endTime="searchData.endTime" @change="change"></DateUtil>
       <SearchItem>
         部门：
         <Select placeholder="请选择" class="w200"></Select>
@@ -10,14 +10,14 @@
       <SearchItem><Checkbox>查看已删除</Checkbox></SearchItem>
       <SearchItem><Button type="primary" icon="md-search" @click="search">查询</Button></SearchItem>
       <SearchItem><Button type="primary" @click="resetSearch">重置查询条件</Button></SearchItem>
-      <ManagerView ref="manager" :save="save" :del="false" :searchData="searchData" :columns="columns" @on-success="managerSuccess" @on-error="managerError"></ManagerView>
+      <ManagerView ref="manager" :save="save" :del="false" :searchData="searchParams" :columns="columns" @on-success="managerSuccess" @on-error="managerError"></ManagerView>
     </div>
   </Card>
 </template>
 
 <script>
   import {getDateTime} from "../../../libs/tools";
-  import {getVideoList} from "../../../api/material";
+  import {getVideoList, getVideoList2} from "../../../api/material";
 
   export default {
     name: "video-manager",
@@ -29,7 +29,11 @@
         },
         loading: false,
         searchData: { // 查询条件
-
+          title: null,
+          startTime: null,
+          endTime: null,
+          department: null,
+          isShowDelete: false
         },
         columns: [
           {
@@ -40,7 +44,7 @@
           },
           {
             title: '标题',
-            key: 'tradeId',
+            key: 'title',
           },
           {
             title: 'GUID',
@@ -62,15 +66,15 @@
           },
           {
             title: '一级分类',
-            key: 'numIid',
+            key: 'first',
           },
           {
             title: '二级分类',
-            key: 'phone',
+            key: 'second',
           },
           {
             title: '三级分类',
-            key: 'phone',
+            key: 'third',
           },
           {
             title: '媒体号',
@@ -120,16 +124,30 @@
         ],
       }
     },
+    computed: {
+      searchParams() {
+        const params = Object.assign({}, this.searchData);
+        params.startTime = getDateTime(params.startTime);
+        params.endTime = getDateTime(params.endTime);
+        return params;
+      }
+    },
     methods: {
       search() {
 
       },
       resetSearch() {
-
+        this.searchData = {
+          title: null,
+          startTime: null,
+          endTime: null,
+          department: null,
+          isShowDelete: false
+        }
       },
       change(start, end) {
-        this.searchData.createTimeStart = start;
-        this.searchData.createTimeEnd = end;
+        this.searchData.startTime = start;
+        this.searchData.endTime = end;
       },
       managerSuccess(type, data) {
 

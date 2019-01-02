@@ -4,10 +4,7 @@
       <div>
         <SearchItem>标题：<Input placeholder="请输入标题" class="w200"/></SearchItem>
         <SearchItem>
-          <span>入库时间：</span>
-          <DatePicker type="datetime" placeholder="开始时间" v-model="searchData.createTimeStart" @on-change="startTimeChange" :options="startTimeOptions"></DatePicker>
-          <span class="mlr5">-</span>
-          <DatePicker type="datetime" placeholder="结束时间" v-model="searchData.createTimeEnd" @on-change="endTimeChange" :options="endTimeOptions"></DatePicker>
+          <DateUtil title="入库时间：" :startTime="searchData.createTimeStart" :endTime="searchData.createTimeEnd" @change="change"></DateUtil>
         </SearchItem>
         <DateUtil title="发布时间：" :startTime="searchData.createTimeStart" :endTime="searchData.createTimeEnd" @change="change"></DateUtil>
       </div>
@@ -29,6 +26,7 @@
 
 <script>
   import {getDateTime} from "../../../libs/tools";
+  import {getVideoSetList} from "../../../api/material";
 
   export default {
     name: "video-group-manager",
@@ -55,7 +53,7 @@
           },
           {
             title: '视频集名称',
-            key: 'tradeId',
+            key: 'videosetName',
           },
           {
             title: '视频集ID',
@@ -77,15 +75,15 @@
           },
           {
             title: '一级分类',
-            key: 'numIid',
+            key: 'firstClass',
           },
           {
             title: '二级分类',
-            key: 'phone',
+            key: 'secondClass',
           },
           {
             title: '三级分类',
-            key: 'phone',
+            key: 'thirdClass',
           },
           {
             title: '所属部门',
@@ -170,7 +168,7 @@
     provide() {
       return {
         handlers: {
-
+          search: getVideoSetList
         }
       }
     }

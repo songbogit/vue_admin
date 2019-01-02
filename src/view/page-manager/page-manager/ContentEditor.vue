@@ -48,7 +48,7 @@
             <div class="right pr-30">
               <Button class="ml-15" icon="md-add" type="primary" @click="showAddContent">新增内容</Button>
               <Button class="ml-15" icon="md-search" type="primary">从数据库中检索</Button>
-              <Button class="ml-15" shape="circle" icon="ios-refresh" @click="getBlockContents"></Button>
+              <Button class="ml-15" shape="circle" icon="ios-refresh" @click="getBlockContents(stype)"></Button>
               <!--<Button class="ml-15" shape="circle" icon="ios-search"></Button>-->
             </div>
           </div>
@@ -258,6 +258,7 @@
             title: '详情',
             render: (h, params) => {
               const props = {type: 'dashed', size: 'small'};
+              const {image, description, title, update_datetime} = params.row;
               const classes = {'mr-5': true};
               return h('div',{
                 class: {
@@ -276,7 +277,7 @@
                     'img-col': true
                   },
                   domProps: {
-                    src: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4127978443,3621625360&fm=111&gp=0.jpg'
+                    src: imgBaseUrl + image
                   }
                 }),
                 h('div', {
@@ -293,20 +294,19 @@
                       line: true,
                       'mb-5': true
                     }
-                  }, '头条小程序预计明年中旬正式公测'),
+                  }, title),
                   h('p', {
                     class: {
                       'cl-dec': true,
                       'mb-5': true,
                       line2: true
                     }
-                  }, '继微信、支付宝、百度后，头条正式宣布研发小程序，并已进入内测阶段，预计明年九月份正式公测，' +
-                    '集抖音、头条等九大流量，更具宣传力。九大流量入口将使头条小程序的广告无处不在，让用户更容易发现。'),
+                  }, description),
                   h('div', [
                     h('Button', {
                       props: props,
                       class: classes
-                    },'2018-11-20 18:53:11')
+                    }, update_datetime)
                   ])
                 ])
               ])
@@ -624,7 +624,7 @@
         deleteBlockContent({id}).then(res => {
           this.showRightSpin = false;
           if (res.code == 200) {
-            this.getBlockContents();
+            this.getBlockContents(this.stype);
           }
         }).catch(res => {
           this.showRightSpin = false;
@@ -680,12 +680,10 @@
           params[item.id.toString()] = params.checked?1:0;
         })
         this.showRightSpin = true;
-        saveConentStatus({
-          map: params
-        }).then(res => {
+        saveConentStatus(params).then(res => {
           this.showRightSpin = false;
           if (res.code == 200) {
-            this.getBlockContents();
+            this.getBlockContents(this.stype);
           }
         }).catch(res => {
           this.showRightSpin = false;
@@ -696,7 +694,7 @@
         const {pageNum, pageSize} = stype==0?this.content_page:this.keyword_page
         this.showRightSpin = true;
         getContentList({
-          stype: stype?stype:this.stype,
+          stype: stype,
           pageNum: pageNum,
           pageSize: pageSize,
           config_id: this.checkBlockId
@@ -740,7 +738,7 @@
           this.loading = false;
           if (res.code == 200) {
             this.showAddContent();
-            this.getBlockContents();
+            this.getBlockContents(this.stype);
           }
         }).catch(res => {
           this.loading = false;

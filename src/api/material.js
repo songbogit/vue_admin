@@ -17,6 +17,9 @@ export const getVideoById = (params) => {
 export const getVideoList = (params) => {
   return getRequest('/material/manager/listVideo', params);
 }
+export const getVideoList2 = (params) => {
+  return postRequest('/material/manager/searchVideo', params);
+}
 
 // 更新单视频
 export const updateVideo = (params) => {
