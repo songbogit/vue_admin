@@ -9,6 +9,7 @@ import i18n from '@/locale'
 import config from '@/config'
 import importDirective from '@/directive'
 import installPlugin from '@/plugin'
+import VueDND from 'awe-dnd'
 import 'iview/dist/styles/iview.css'
 import './index.less'
 import './assets/css/common.less'
@@ -21,6 +22,7 @@ import '@/assets/icons/iconfont.css'
 Vue.use(iView, {
   i18n: (key, value) => i18n.t(key, value)
 })
+Vue.use(VueDND)
 /**
  * @description 注册admin内置插件
  */

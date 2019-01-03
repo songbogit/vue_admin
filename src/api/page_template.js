@@ -130,3 +130,8 @@ export const deleteBlockContent = (params) => {
 export const updateBlockContent = (params) => {
   return postJson('/page/dataSource/update', params);
 }
+
+// 排序
+export const sortContentList = (params) => {
+  return postRequest('/page/dataSource/sortDataSource', params);
+}

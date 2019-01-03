@@ -54,26 +54,94 @@
           </div>
           <div class="pl-15 pr-15">
             <Tabs type="card" class="mt-20" v-model="stype">
-              <TabPane label="模块" name="0">
-                <Table :columns="content_col" :data="content_list" :show-header="true"></Table>
+              <TabPane label="内容(可拖拽排序)" name="0">
+                <!--<Table :columns="content_col" :data="content_list" :show-header="true"></Table>-->
+                <div v-if="content_list.length" class="borderB">
+                  <Row>
+                    <Col class="center" span="4">是否为草稿</Col>
+                    <Col class="center" span="12">详情</Col>
+                    <Col class="center" span="8">操作</Col>
+                  </Row>
+                  <Row
+                    class="drag-item"
+                    v-for="content in content_list" v-dragging ="{ item: content, list: content_list, group: 'content' }"
+                    :key="content.id"
+                  >
+                    <Col span="4" class="center mt-35">
+                      <Checkbox v-model="content.is_draft == 1" @on-change="content.is_draft = content.is_draft?0:1"></Checkbox>
+                    </Col>
+                    <Col span="12">
+                      <div class="clear mt-10 mb-10 relative">
+                        <img :src="imgBaseUrl + content.image" class="left block h60 w100 img-col">\
+                        <div class="left ml-10 content-col">
+                          <p class="bold fs14 line mb-5">{{content.title}}</p>
+                          <p class="cl-dec mb-5 line2">{{content.description}}</p>
+                          <div>
+                            <Button type="dashed" size="small" class="mr-5">{{content.update_datetime}}</Button>
+                          </div>
+                        </div>
+                      </div>
+                    </Col>
+                    <Col span="8" class="center mt-35">
+                      <Button type="primary" class="mr-5" @click="getContentDetail(content.id)">编辑</Button>
+                      <Button type="error" class="mr-5" @click="deleteContentById(content.id)">删除</Button>
+                    </Col>
+                  </Row>
+                </div>
+                <div v-if="!content_list.length" class="border middle h60">暂时没有数据</div>
                 <div class="t-right mt20">
                   <Page :current="content_page.pageNum" :total="content_page.total" :page-size="content_page.pageSize"
                         @on-change="contentPageChange" @on-page-size-change="contentPageSizeChange" :page-size-opts="[10,20]"
                         size="small" show-total show-elevator show-sizer></Page>
                 </div>
                 <div class="mt10">
-                  <Button type="primary" @click="saveContents">保存</Button>
+                  <Button type="primary" @click="saveContents">保存状态</Button>
+                  <Button type="primary" class="ml-10" @click="sortContentList">保存排序</Button>
                 </div>
               </TabPane>
-              <TabPane label="关键字" name="1">
-                <Table :columns="keyword_col" :data="keyword_list" :show-header="true"></Table>
+              <TabPane label="关键字(可拖拽排序)" name="1">
+                <!--<Table :columns="keyword_col" :data="keyword_list" :show-header="true"></Table>-->
+                <div v-if="keyword_list.length" class="borderB">
+                  <Row class="drag-item">
+                    <Col class="center" span="4">是否为草稿</Col>
+                    <Col class="center" span="12">详情</Col>
+                    <Col class="center" span="8">操作</Col>
+                  </Row>
+                  <Row
+                    class="drag-item"
+                    v-for="keyword in keyword_list" v-dragging ="{ item: keyword, list: keyword_list, group: 'keyword' }"
+                    :key="keyword.id"
+                  >
+                    <Col span="4" class="center mt-35">
+                      <Checkbox v-model="keyword.is_draft == 1" @on-change="keyword.is_draft = keyword.is_draft?0:1"></Checkbox>
+                    </Col>
+                    <Col span="12">
+                      <div class="clear mt-10 mb-10 relative">
+                        <img :src="imgBaseUrl + keyword.image" class="left block h60 w100 img-col">\
+                        <div class="left ml-10 content-col">
+                          <p class="bold fs14 line mb-5">{{keyword.title}}</p>
+                          <p class="cl-dec mb-5 line2">{{keyword.description}}</p>
+                          <div>
+                            <Button type="dashed" size="small" class="mr-5">{{keyword.update_datetime}}</Button>
+                          </div>
+                        </div>
+                      </div>
+                    </Col>
+                    <Col span="8" class="center mt-35">
+                      <Button type="primary" class="mr-5" @click="getContentDetail(keyword.id)">编辑</Button>
+                      <Button type="error" class="mr-5" @click="deleteContentById(keyword.id)">删除</Button>
+                    </Col>
+                  </Row>
+                </div>
+                <div v-if="!keyword_list.length" class="border middle h60">暂时没有数据</div>
                 <div class="t-right mt20">
                   <Page :current="keyword_page.pageNum" :total="keyword_page.total" :page-size="keyword_page.pageSize"
                         @on-change="keyPageChange" @on-page-size-change="keyPageSizeChange" :page-size-opts="[10,20]"
                         size="small" show-total show-elevator show-sizer></Page>
                 </div>
                 <div class="mt10">
-                  <Button type="primary" @click="saveContents">保存</Button>
+                  <Button type="primary" @click="saveContents">保存状态</Button>
+                  <Button type="primary" class="ml-10" @click="sortContentList">保存排序</Button>
                 </div>
               </TabPane>
             </Tabs>
@@ -110,6 +178,14 @@
       <Icon type="ios-loading" size=18 class="spin-icon-load"></Icon>
       <div>Loading</div>
     </Spin>
+    <!--<div class="color-list">-->
+      <!--<div-->
+        <!--class="color-item"-->
+        <!--v-for="color in colors" v-dragging="{ item: color, list: colors, group: 'color' }"-->
+        <!--:key="color.text"-->
+      <!--&gt;{{color.text}}</div>-->
+    <!--</div>-->
+
   </Card>
 </template>
 
@@ -117,7 +193,7 @@
   import {
     getBlockContentDetail, getPageDetail, getContentList,
     addBlockContent, saveConentStatus, deleteBlockContent,
-    updateBlockContent
+    updateBlockContent, sortContentList
   } from "../../../api/page_template";
   import {imgBaseUrl} from "../../../config";
 
@@ -125,118 +201,12 @@
     name: "content-edit",
     data() {
       return {
+        imgBaseUrl: imgBaseUrl,
         showSpin: false,
         showRightSpin: false,
         loading: false,
         // 内容检索数据
         search_col: [
-          {
-            type: 'selection',
-            width: 40,
-            align: 'center'
-          },
-          {
-            render: (h, params) => {
-              const props = {type: 'dashed', size: 'small'};
-              const classes = {'mr-5': true};
-              return h('div',{
-                class: {
-                  clear: true,
-                  'mt-10': true,
-                  'mb-10': true,
-                  relative: true
-                }
-              },[
-                h('img', {
-                  class: {
-                    left: true,
-                    block: true,
-                    'h60': true,
-                    'w100': true,
-                    'img-col': true
-                  },
-                  domProps: {
-                    src: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4127978443,3621625360&fm=111&gp=0.jpg'
-                  }
-                }),
-                h('div', {
-                  class: {
-                    left: true,
-                    ml10: true,
-                    'content-col': true
-                  }
-                },[
-                  h('p', {
-                    class: {
-                      bold: true,
-                      fs14: true,
-                      line: true,
-                      'mb-5': true
-                    }
-                  }, '头条小程序预计明年中旬正式公测'),
-                  h('p', {
-                    class: {
-                      'cl-dec': true,
-                      'mb-5': true,
-                      line2: true
-                    }
-                  }, '继微信、支付宝、百度后，头条正式宣布研发小程序，并已进入内测阶段，预计明年九月份正式公测，' +
-                    '集抖音、头条等九大流量，更具宣传力。九大流量入口将使头条小程序的广告无处不在，让用户更容易发现。'),
-                  h('div', [
-                    h('Button', {
-                      props: props,
-                      class: classes
-                    },'2018-11-20 18:53:11')
-                  ])
-                ])
-              ])
-            }
-          },
-          {
-            title: '操作',
-            key: 'action',
-            width: 120,
-            align: 'center',
-            render: (h, params) => {
-              const props = {size: 'small'};
-              const classes = {'mr-5': true};
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  class: classes,
-                  on: {
-                    click: () => {
-
-                    }
-                  }
-                }, '编辑'),
-                h('Button', {
-                  props: {
-                    type: 'error',
-                    size: 'small'
-                  },
-                  class: classes,
-                  on: {
-                    click: () => {
-
-                    }
-                  }
-                }, '删除')
-              ])
-            }
-          }
-        ],
-        search_page: {
-          pageNum: 1,
-          total: 0,
-          pageSize: 10
-        },
-        search_list: [],
-        // 模块关键字数据
-        keyword_col: [
           {
             title: '是否为草稿',
             width: 80,
@@ -349,6 +319,13 @@
             }
           }
         ],
+        search_page: {
+          pageNum: 1,
+          total: 0,
+          pageSize: 10
+        },
+        search_list: [],
+        // 模块关键字数据
         keyword_page: {
           pageNum: 1,
           total: 0,
@@ -356,120 +333,6 @@
         },
         keyword_list: [],
         // 模块内容数据
-        content_col: [
-          {
-            title: '是否为草稿',
-            width: 80,
-            align: 'center',
-            render: (h, params) => {
-              return h('Checkbox', {
-                props: {
-                  value: params.row.checked
-                },
-                on: {
-                  'on-change': (event) => {
-                    console.log(event);
-                    this.content_list[params.index].checked = event;
-                  }
-                }
-              })
-            }
-          },
-          {
-            title: '详情',
-            render: (h, params) => {
-              const props = {type: 'dashed', size: 'small'};
-              const {image, description, title, update_datetime} = params.row;
-              const classes = {'mr-5': true};
-              return h('div',{
-                class: {
-                  clear: true,
-                  'mt-10': true,
-                  'mb-10': true,
-                  relative: true
-                }
-              },[
-                h('img', {
-                  class: {
-                    left: true,
-                    block: true,
-                    'h60': true,
-                    'w100': true,
-                    'img-col': true
-                  },
-                  domProps: {
-                    src: imgBaseUrl + image
-                  }
-                }),
-                h('div', {
-                  class: {
-                    left: true,
-                    ml10: true,
-                    'content-col': true
-                  }
-                },[
-                  h('p', {
-                    class: {
-                      bold: true,
-                      fs14: true,
-                      line: true,
-                      'mb-5': true
-                    }
-                  }, title),
-                  h('p', {
-                    class: {
-                      'cl-dec': true,
-                      'mb-5': true,
-                      line2: true
-                    }
-                  }, description),
-                  h('div', [
-                    h('Button', {
-                      props: props,
-                      class: classes
-                    }, update_datetime)
-                  ])
-                ])
-              ])
-            }
-          },
-          {
-            title: '操作',
-            key: 'action',
-            width: 120,
-            align: 'center',
-            render: (h, params) => {
-              const props = {size: 'small'};
-              const classes = {'mr-5': true};
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  class: classes,
-                  on: {
-                    click: () => {
-                      this.getContentDetail(params.row.id);
-                    }
-                  }
-                }, '编辑'),
-                h('Button', {
-                  props: {
-                    type: 'error',
-                    size: 'small'
-                  },
-                  class: classes,
-                  on: {
-                    click: () => {
-                      this.deleteContentById(params.row.id);
-                    }
-                  }
-                }, '删除')
-              ])
-            }
-          }
-        ],
         content_page: {
           pageNum: 1,
           total: 0,
@@ -556,26 +419,20 @@
         checkBlockId: null, // 选中的模块id
         checkBlockTitle: null, // 选中的模块title
         layouts: [],
-        stype: '0'
+        stype: '0',
+        colors: [{
+          text: "Aquamarine"
+        },  {
+          text: "Skyblue"
+        }, {
+          text: "Burlywood"
+        }]
       }
     },
     computed: {
       editId() {
         return Number(this.$store.state.page.editContentId);
       },
-      // checkBlockId() {
-      //
-      // },
-      // blockDetail() {
-      //   if (this.checkBlockIndex !== null) {
-      //
-      //   } else {
-      //     return {
-      //       contents: [],
-      //       keyWords: []
-      //     }
-      //   }
-      // }
     },
     methods: {
       showAddContent() {
@@ -617,6 +474,19 @@
           this.checkBlockId = id;
           this.checkBlockTitle = title;
         }
+      },
+      // 排序
+      sortContentList() {
+        const list = this.stype == 0 ? this.content_list : this.keyword_list;
+        const sortStr = list.map(item => item.id).join(',');
+        this.showRightSpin = true;
+        sortContentList({
+          sortStr
+        }).then(res => {
+          this.showRightSpin = false;
+        }).catch(res => {
+          this.showRightSpin = false;
+        })
       },
       // 删除
       deleteContentById(id) {
@@ -677,13 +547,13 @@
         const list = this.stype == 0? this.content_list : this.keyword_list;
         const params = {};
         list.forEach(item => {
-          params[item.id.toString()] = params.checked?1:0;
+          params[item.id.toString()] = item.is_draft;
         })
         this.showRightSpin = true;
         saveConentStatus(params).then(res => {
           this.showRightSpin = false;
           if (res.code == 200) {
-            this.getBlockContents(this.stype);
+            // this.getBlockContents(this.stype);
           }
         }).catch(res => {
           this.showRightSpin = false;
@@ -704,9 +574,6 @@
             const data = res.data
             const {list} = data || {};
             const contentList = list? list.list||[]:[];
-            contentList.forEach(item => {
-              item.checked = !!item.is_draft;
-            })
             if (stype == 0) {
               this.content_list = contentList;
               this.content_page.total = list? list.total:0;
@@ -772,6 +639,10 @@
       } else {
         this.getPageDetail();
       }
+    },
+    mounted() {
+      this.$dragging.$on('dragged', ({ value }) => {
+      })
     }
   }
 </script>
@@ -792,5 +663,13 @@
     from { transform: rotate(0deg);}
     50%  { transform: rotate(180deg);}
     to   { transform: rotate(360deg);}
+  }
+  .drag-item{
+    border:1px solid #f2f2f2;
+    border-bottom: none;
+    padding:10px 5px;
+  }
+  .drag-item:hover {
+    background: #ebf7ff;
   }
 </style>
