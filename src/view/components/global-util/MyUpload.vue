@@ -111,8 +111,8 @@
       }
     },
     methods: {
-      handleView (item) {
-        this.imgName = item.src;
+      handleView (src) {
+        this.imgName = src;
         this.visible = true;
       },
       handleRemove (index) {

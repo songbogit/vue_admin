@@ -24,7 +24,14 @@
             <Input  class="w300"/>
           </FormItem>
           <FormItem label="封面图片：">
-            <Input class="w300"/>
+            <MyUpload
+              class="block"
+              :upload-list="uploadList"
+              @on-remove="removeHandler"
+              @on-success="successHandler"
+              :format="format"
+              :max-size="2048"
+            ></MyUpload>
           </FormItem>
           <FormItem label="历史封面地址：">
             <Select class="w300" placeholder="请选择"></Select>
@@ -115,13 +122,18 @@
 </template>
 
 <script>
-  import {getVideoById, addVideo} from "../../../api/material";
+  import {getVideoById, addVideo, updateVideo} from "../../../api/material";
   import {getDateTime} from "../../../libs/tools";
+  import MyUpload from './../../components/global-util/MyUpload';
 
   export default {
     name: "video-edit",
+    components: {
+      MyUpload
+    },
     data() {
       return {
+        format: ['jpg', 'jpeg', 'png'],
         showSpin: false,
         entity: {
           title: '', // 标题
@@ -144,7 +156,6 @@
           main_set: '', // 主视频集
           webUrl: '', // 视频web地址,
           description: '', // 简介
-
         },
         tag: '',
         key: '',
@@ -157,6 +168,9 @@
       editId() {
         return this.$store.state.material.videoEditId;
       },
+      uploadList() {
+        return this.entity.photoUrl?[this.entity.photoUrl]:[];
+      },
       tags() {
         const tags = this.entity.coreTags;
         return tags ? tags.split(',') : [];
@@ -167,6 +181,15 @@
       }
     },
     methods: {
+      // 图片上传handler
+      removeHandler() {
+        this.entity.photoUrl = '';
+      },
+      successHandler(res, file) {
+        if (res.code == 200) {
+          this.entity.photoUrl = res.data;
+        }
+      },
       addTag() {
         if (this.tag.trim()) {
           const tags = this.entity.coreTags;
@@ -185,15 +208,20 @@
       // 添加视频
       addVideo() {
         const params = JSON.parse(JSON.stringify(this.entity));
-        params.keywords = this.keys.join(',');
-        params.coreTags = this.tags.join(',');
         params.playTime = getDateTime(params.playTime);
         params.replayTime = getDateTime(params.replayTime);
         params.inputTime = getDateTime(new Date());
         params.cmsUpdateTime = getDateTime(new Date());
         this.showSpin = true;
-        addVideo(params).then(res => {
+        const handler = this.editId ? updateVideo : addVideo;
+        if (!this.editId) {
+          delete params.id;
+        }
+        handler(params).then(res => {
           this.showSpin = false;
+          if (res.code == 200) {
+            this.$router.push('/material-manager/video-manager');
+          }
         }).catch(res => {
           this.showSpin = false;
         })
@@ -203,6 +231,10 @@
         this.showSpin = true;
         getVideoById({id: this.editId}).then(res => {
           this.showSpin = false;
+          if (res.code == 200) {
+            const data = res.data.video;
+            this.entity = data;
+          }
         }).catch(res => {
           this.showSpin = false;
         })
