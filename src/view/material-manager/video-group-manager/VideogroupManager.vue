@@ -119,7 +119,7 @@
                   class: classes,
                   on: {
                     click: () => {
-
+                      this.addVideoSet();
                     }
                   }
                 }, '编目'),
@@ -158,6 +158,10 @@
         this.searchData.createTimeStart = start;
         this.searchData.createTimeEnd = end;
       },
+      addVideoSet(id = '') {
+        this.$store.commit('setVideoSetEditId', id);
+        this.$router.push('/material-manager/video-group-edit');
+      },
       managerSuccess(type, data) {
 
       },
@@ -168,10 +172,11 @@
     provide() {
       return {
         handlers: {
-          search: getVideoSetList
+          search: getVideoSetList,
+          save: this.addVideoSet
         }
       }
-    }
+    },
   }
 </script>
 

@@ -240,6 +240,10 @@
         })
       }
     },
+    beforeRouteLeave (to, from, next) {
+      this.$store.commit('setVideoEditId', '');
+      next();
+    },
     mounted() {
       if (this.editId) {
         document.title = '编辑视频';

@@ -74,7 +74,7 @@
           total: 0,
           pageSize: 10
         },
-        list: [{}],
+        list: [],
         selected: []
       }
     },
@@ -123,7 +123,7 @@
       getSearchData() {
         const params = Object.assign({}, this.searchData);
         if (!this.unPage) {
-          params.page = this.page.current;
+          params.page = this.page.current - 1;
           params.size = this.page.pageSize;
         }
         return params;

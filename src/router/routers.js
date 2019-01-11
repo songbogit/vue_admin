@@ -83,7 +83,7 @@ export default [
         meta: {
           title: '视频编目',
           icon: 'ios-settings',
-          // notCache: true
+          notCache: true
         },
         component: () => import('@/view/material-manager/video-manager/VideoEidtor.vue')
       },
@@ -103,7 +103,7 @@ export default [
         meta: {
           title: '视频集编目',
           icon: 'ios-settings',
-          // notCache: true
+          notCache: true
         },
         component: () => import('@/view/material-manager/video-group-manager/VideogroupEditor.vue')
       },

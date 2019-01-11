@@ -16,7 +16,14 @@
             <Input  class="w300"/>
           </FormItem>
           <FormItem label="主图：">
-            <Input class="w300"/>
+            <MyUpload
+              class="block"
+              :upload-list="uploadList"
+              @on-remove="removeHandler"
+              @on-success="successHandler"
+              :format="format"
+              :max-size="2048"
+            ></MyUpload>
           </FormItem>
           <FormItem label="媒体属性：">
             <Input  class="w300"/>
@@ -64,14 +71,17 @@
 </template>
 
 <script>
-  import ManagerView from '@/view/components/global-util/ManagerView';
+  import {getVideoSetById, updateVideoSet} from "../../../api/material";
+  import MyUpload from './../../components/global-util/MyUpload';
+
   export default {
     name: "video-group-edit",
     components: {
-      ManagerView
+      MyUpload
     },
     data() {
       return {
+        format: ['jpg', 'jpeg', 'png'],
         columns: [
           {
             title: '视频名称',
@@ -126,17 +136,57 @@
               ])
             }
           }
-        ]
+        ],
+        entity: {
+          videosetName: '', // 标题
+          playTime: null, // 首播时间
+          playReplaytime: null, // 重播时间
+          videosetCoverpic: null, // 封面
+        }
       }
     },
+    computed: {
+      editId() {
+        return this.$store.state.material.videoSetEditId;
+      },
+      uploadList() {
+        return this.entity.videosetCoverpic?[this.entity.videosetCoverpic]:[];
+      },
+    },
     methods: {
-
+      // 图片上传handler
+      removeHandler() {
+        this.entity.videosetCoverpic = '';
+      },
+      successHandler(res, file) {
+        if (res.code == 200) {
+          this.entity.videosetCoverpic = res.data;
+        }
+      },
     },
     provide() {
       return {
         handlers: {
 
         }
+      }
+    },
+    beforeRouteLeave (to, from, next) {
+      this.$store.commit('setVideoSetEditId', '');
+      next();
+    },
+    created() {
+      if (this.editId) {
+        document.title = '修改视频集';
+        getVideoSetById({
+          id: this.editId
+        }).then(res => {
+          if (res.code == 200) {
+
+          }
+        })
+      } else {
+        document.title = '添加视频集';
       }
     }
   }
