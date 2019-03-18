@@ -12,7 +12,7 @@
           <FormItem label="关键字：">
             <div>
               <!--<Tag color="primary" type="dot">测试回显</Tag><Tag color="primary" type="dot">测试</Tag>-->
-              <Tag color="primary" type="dot" v-for="(item, index) of keys" :key="'key'+index">{{item}}</Tag>
+              <Tag color="primary" type="dot" v-for="(item, index) of keys" :key="'key'+index" closable @on-close="keyClose(index)">{{item}}</Tag>
             </div>
             <div>
               <Input class="w300" v-model="key" @on-enter="addKey"/>
@@ -68,19 +68,19 @@
             <Select class="w200"></Select>
           </FormItem>
           <FormItem label="所处媒体号：">
-            <Input  class="w300"/>
+            <Input  class="w300" v-model="entity.mId"/>
           </FormItem>
           <FormItem label="分类：">
-            <Input  class="w300"/>
+            <Input  class="w300" v-model="entity.first"/>
           </FormItem>
           <FormItem label="GUID：">
-            <Input  class="w300"/>
+            <Input  class="w300" v-model="entity.contentGUID"/>
           </FormItem>
           <FormItem label="简介：">
-            <Input class="w300"/>
+            <Input class="w300" v-model="entity.contentBrief"/>
           </FormItem>
           <FormItem label="嘉宾：">
-            <Input  class="w300"/>
+            <Input  class="w300" v-model="entity.guests"/>
           </FormItem>
           <FormItem label="同步直播频道：">
             <Select class="w300" placeholder="请选择"></Select>
@@ -94,6 +94,9 @@
           <FormItem label="重播频道：">
             <Select class="w300" placeholder="请选择"></Select>
           </FormItem>
+          <FormItem label="重播时间：">
+            <DatePicker class="w300" placeholder="请选择" v-model="entity.replayTime"></DatePicker>
+          </FormItem>
           <FormItem label="视频web地址：">
             <Input  class="w300"/>
           </FormItem>
@@ -103,13 +106,16 @@
           <FormItem label="标签：">
             <div>
               <!--<Tag color="primary" type="dot">测试回显</Tag><Tag color="primary" type="dot">测试</Tag>-->
-              <Tag color="primary" type="dot" v-for="(item, index) of tags" :key="'tag'+index">{{item}}</Tag>
+              <Tag color="primary" type="dot" v-for="(item, index) of tags" :key="'tag'+index" closable @on-close="tagClose(index)">{{item}}</Tag>
             </div>
             <div>
               <Input class="w300" v-model="tag" @on-enter="addTag"/>
               <Button type="primary" class="ml-5" @click="addTag">添加标签</Button>
             </div>
             <p>标签可输入多个</p>
+          </FormItem>
+          <FormItem label="单视频id：">
+            <Input  class="w300" v-model="entity.contentGUID"/>
           </FormItem>
         </Col>
       </Row>
@@ -136,26 +142,68 @@
         format: ['jpg', 'jpeg', 'png'],
         showSpin: false,
         entity: {
-          title: '', // 标题
-          keywords: '', // 关键字
-          catalogingStatus: '', // 编目状态
-          photoUrl: '', // 封面地址
-          column: '', // 栏目
-          host: '', // 主持人
-          playTime: null, // 首播时间
-          replayTime: null, // 重播时间
-          inputTime: null, // 视频入cms时间
+          area: '',
+          catalogingStatus: '',
+          channel: '',
           cmsUpdateTime: null,
-          contentBrief: '', // 内容概要
-          content: '', // 内容
-          channel: '', // 直播频道
-          synchronizedChannel: '', // 同步直播频道
-          coreTags: '', // 标签
-          contentGuid: '', //GUID
-          guests: '', // 嘉宾
-          main_set: '', // 主视频集
-          webUrl: '', // 视频web地址,
-          description: '', // 简介
+          column: '',
+          content: '',
+          contentBrief: '',
+          contentGUID: '',
+          contentId: '',
+          contentProviders: '',
+          contentType: '',
+          coreTags: '',
+          createTime: null,
+          description: '',
+          director: '',
+          duration: '',
+          editMode: '',
+          entityType: '',
+          first: '',
+          flag: '',
+          groupId: '',
+          guests: '',
+          host: '',
+          id: '',
+          inputTime: null,
+          isOnshelf: '',
+          is_local: '',
+          keywords: '',
+          language: '',
+          mId: '',
+          mainOrganize: '',
+          majorCharacter: '',
+          month: '',
+          otherResponsible: '',
+          otherTasks: '',
+          parentId: '',
+          partNumber: '',
+          photoUrl: '',
+          playTime: '',
+          produce: '',
+          producer: '',
+          rater: '',
+          reporter: '',
+          respondents: '',
+          screenWriter: '',
+          second: '',
+          seqNo: '',
+          serviceId: '',
+          size: '',
+          sourceMedia: '',
+          sourceType: '',
+          starring: '',
+          subTitle: '',
+          subject: '',
+          synchronizedChannel: '',
+          tagId: '',
+          third: '',
+          timeMillis: '',
+          title: '',
+          totalDiversity: '',
+          updateTime: '',
+          year: ''
         },
         tag: '',
         key: '',
@@ -189,6 +237,16 @@
         if (res.code == 200) {
           this.entity.photoUrl = res.data;
         }
+      },
+      keyClose(index) {
+        const keys = [...this.keys];
+        keys.splice(index, 1);
+        this.entity.keywords = keys.join(',');
+      },
+      tagClose(index) {
+        const tags = [...this.tags];
+        tags.splice(index, 1);
+        this.entity.coreTags = tags.join(',');
       },
       addTag() {
         if (this.tag.trim()) {

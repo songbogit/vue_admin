@@ -13,7 +13,15 @@
             <Select class="w300" placeholder="请选择"></Select>
           </FormItem>
           <FormItem label="关键字：">
-            <Input  class="w300"/>
+            <div>
+              <!--<Tag color="primary" type="dot">测试回显</Tag><Tag color="primary" type="dot">测试</Tag>-->
+              <Tag color="primary" type="dot" v-for="(item, index) of keys" :key="'key'+index" closable @on-close="keyClose(index)">{{item}}</Tag>
+            </div>
+            <div>
+              <Input class="w300" v-model="key" @on-enter="addKey"/>
+              <Button type="primary" class="ml5" @click="addKey">添加关键字</Button>
+            </div>
+            <p>关键字可输入多个</p>
           </FormItem>
           <FormItem label="主图：">
             <MyUpload
@@ -57,11 +65,11 @@
         </Col>
       </Row>
     </Form>
+    <p class="bold mb-5 clear">
+      <Button type="primary" class="right">挑选视频</Button>
+    </p>
     <ManagerView ref="wait" :save="null" :del="false" :columns="columns">
-      <p class="bold mb-5 clear">
-        已选视频
-        <Button type="primary" class="right">挑选视频</Button>
-      </p>
+      <p class="bold mb-5">已选视频</p>
     </ManagerView>
     <div class="center">
       <Button type="primary" class="w200 mt-20">提交</Button>
@@ -142,7 +150,9 @@
           playTime: null, // 首播时间
           playReplaytime: null, // 重播时间
           videosetCoverpic: null, // 封面
-        }
+          keywords: '', // 关键字
+        },
+        key: '',
       }
     },
     computed: {
@@ -152,6 +162,10 @@
       uploadList() {
         return this.entity.videosetCoverpic?[this.entity.videosetCoverpic]:[];
       },
+      keys() {
+        const keys = this.entity.keywords;
+        return keys ? keys.split(',') : [];
+      }
     },
     methods: {
       // 图片上传handler
@@ -161,6 +175,19 @@
       successHandler(res, file) {
         if (res.code == 200) {
           this.entity.videosetCoverpic = res.data;
+        }
+      },
+      keyClose(index) {
+        const keys = [...this.keys];
+        keys.splice(index, 1);
+        this.entity.keywords = keys.join(',');
+      },
+      addKey() {
+        const key = this.key.trim();
+        if (key) {
+          const keys = this.entity.keywords;
+          this.entity.keywords = keys ? keys + `,${key}` : key;
+          this.key = '';
         }
       },
     },

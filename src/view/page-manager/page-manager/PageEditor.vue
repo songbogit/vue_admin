@@ -45,7 +45,7 @@
             </FormItem>
             <FormItem label="关键字：">
               <div>
-                <Tag color="primary" type="dot" v-for="(item, index) of pageDetail.keywords" :key="'tag' + index">{{item}}</Tag>
+                <Tag color="primary" type="dot" v-for="(item, index) of pageDetail.keywords" :key="'tag' + index" closable @on-close="keyClose(index)">{{item}}</Tag>
               </div>
               <div>
                 <Input style="width: 60%" @keyup.enter="addPageTag" v-model="keyword"/>
@@ -278,6 +278,9 @@
       }
     },
     methods: {
+      keyClose(index) {
+        this.pageDetail.keywords.splice(index, 1);
+      },
       // 添加关键字
       addPageTag() {
         this.pageDetail.keywords.push(this.keyword);

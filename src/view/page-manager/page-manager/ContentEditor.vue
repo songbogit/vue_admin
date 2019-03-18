@@ -155,7 +155,45 @@
       </Col>
     </Row>
     <ModalUtil ref="create" :title="createModel.id?'编辑':'创建'" :loading="loading" @on-ok="okHandler" @reset="resetAddContent">
-      <FormUtil ref="createModel" :model="createModel" :rules="createRule" :comp="createComp" @on-submit="createSubmit"></FormUtil>
+      <!--<FormUtil ref="createModel" :model="createModel" :rules="createRule" :comp="createComp" @on-submit="createSubmit"></FormUtil>-->
+      <Form ref="form" :model="createModel" :rules="createRule" :label-width="100">
+        <FormItem label="标题">
+          <Input v-model="createModel.title"/>
+        </FormItem>
+        <FormItem label="副标题">
+          <Input v-model="createModel.sub_title"/>
+        </FormItem>
+        <FormItem label="简介">
+          <Input v-model="createModel.description" type="textarea" :rows="2"/>
+        </FormItem>
+        <FormItem label="标签">
+          <Select></Select>
+        </FormItem>
+        <FormItem label="展示图片">
+          <MyUpload
+            :upload-list="createModel.image"
+            @on-success="handleSuccess"
+            @on-remove="removeHandler"
+            :format="['jpg','jpeg','png','svg']"
+            type="drag"
+          />
+        </FormItem>
+        <FormItem label="左上角文字">
+          <Input v-model="createModel.imgmark_lt_text"/>
+        </FormItem>
+        <FormItem label="浏览权限">
+          <RadioGroup v-model="createModel.permission">
+            <Radio :label="0">所有用户</Radio>
+            <Radio :label="1">仅限会员</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="内容状态">
+          <RadioGroup v-model="createModel.is_draft">
+            <Radio :label="0">发布</Radio>
+            <Radio :label="1">草稿</Radio>
+          </RadioGroup>
+        </FormItem>
+      </Form>
     </ModalUtil>
     <ModalUtil ref="search" title="从数据库中检索" :width="800" :footerHide="true">
       <div>
@@ -196,9 +234,13 @@
     updateBlockContent, sortContentList
   } from "../../../api/page_template";
   import {imgBaseUrl} from "../../../config";
+  import MyUpload from '@/view/components/global-util/MyUpload';
 
   export default {
     name: "content-edit",
+    components: {
+      MyUpload
+    },
     data() {
       return {
         imgBaseUrl: imgBaseUrl,
@@ -406,7 +448,6 @@
           {compName: 'Input', label: '副标题：', value: 'sub_title', placeholder: '副标题'},
           {compName: 'Input', label: '简介：', value: 'description', type: 'textarea', placeholder: '简介'},
           {compName: 'Select', label: '标签：', value: 'tags', mutiple: true, list:[], placeholder: '请选择标签'},
-          // {compName: 'Select', label: '内容类型：', value: 'type', list: [], placeholder: '内容类型'},
           {compName: 'upload', label: '展示图片：', value: 'image'},
           {compName: 'Input', label: '左上角标文字：', value: 'imgmark_lt_text', placeholder: '左上角标文字'},
           {compName: 'RadioGroup', label: '浏览权限：', value: 'permission', list: [{label: '所有用户', value: 0}, {label: '仅限会员', value: 1}]},
@@ -435,6 +476,14 @@
       },
     },
     methods: {
+      removeHandler(index) {
+        this.createModel.image.splice(index, 1);
+      },
+      handleSuccess(res, file) {
+        if (res.code == 200) {
+          this.createModel.image.push(res.data);
+        }
+      },
       showAddContent() {
         this.$refs['create'].toggleShow();
       },
@@ -588,7 +637,11 @@
       },
       // 创建内容
       okHandler() {
-        this.$refs['createModel'].submit();
+        this.$refs['form'].validate(valid => {
+          if (valid) {
+            this.createSubmit(this.createModel);
+          }
+        })
       },
       createSubmit(entity) {
         const params = JSON.parse(JSON.stringify(entity));

@@ -36,7 +36,7 @@ axios.interceptors.response.use(response => {
         break;
       case 403:
         // 没有权限
-        Message.error('登录失效');
+        Message.error('没有权限');
         break
       case 500:
         // 错误

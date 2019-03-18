@@ -15,6 +15,7 @@ import './index.less'
 import './assets/css/common.less'
 import './assets/css/module.css'
 import '@/assets/icons/iconfont.css'
+import {postRequest} from 'libs/axios'
 // 实际打包时应该不引入mock
 /* eslint-disable */
 // if (process.env.NODE_ENV !== 'production') require('@/mock')
@@ -46,5 +47,8 @@ new Vue({
   router,
   i18n,
   store,
-  render: h => h(App)
+  render: h => h(App),
+  mounted() {
+
+  }
 })

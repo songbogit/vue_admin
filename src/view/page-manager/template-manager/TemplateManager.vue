@@ -21,7 +21,23 @@
             size="small" show-total show-elevator show-sizer></Page>
     </div>
     <ModalUtil ref="create" title="创建模板" :loading="loading" @reset="resetCreateData" @on-ok="okHandler">
-      <FormUtil ref="createForm" :label-width="100" :model="createModel" :rules="createRule" :comp="createComp" @on-submit="submit"></FormUtil>
+      <!--<FormUtil ref="createForm" :label-width="100" :model="createModel" :rules="createRule" :comp="createComp" @on-submit="submit"></FormUtil>-->
+      <Form ref="form" :model="createModel" :rules="createRule" :label-width="100">
+        <Form ref="form" :model="createModel" :rules="createRule" :label-width="100">
+          <FormItem label="标题">
+            <Input v-model="createModel.name"/>
+          </FormItem>
+          <FormItem label="展示图片">
+            <MyUpload
+              :upload-list="createModel.thumb"
+              @on-success="handleSuccess"
+              @on-remove="removeHandler"
+              :format="['jpg','jpeg','png','svg']"
+              type="drag"
+            />
+          </FormItem>
+        </Form>
+      </Form>
     </ModalUtil>
   </Card>
 </template>
@@ -29,9 +45,13 @@
 <script>
   import {imgBaseUrl} from "../../../config";
   import { pageTemplateList, createTemplate } from "../../../api/page_template";
+  import MyUpload from '@/view/components/global-util/MyUpload';
 
   export default {
     name: "template-manager",
+    components: {
+      MyUpload
+    },
     data() {
       return {
         imgBaseUrl: imgBaseUrl,
@@ -50,12 +70,12 @@
         },
         loading: false,
         createRule: {
-          name: [
-            { required: true, type: 'string', message: '请输入模板名称', trigger: 'blur' }
-          ],
-          thumb: [
-            { required: true, type: 'array', message: '请选择模板示图', trigger: 'change' }
-          ]
+          // name: [
+          //   { required: true, type: 'string', message: '请输入模板名称', trigger: 'blur' }
+          // ],
+          // thumb: [
+          //   { required: true, type: 'array', message: '请选择模板示图', trigger: 'change' }
+          // ]
         },
         createComp: [
           {compName: 'Input', label: '标题：', value: 'name', placeholder: '主标题'},
@@ -64,11 +84,23 @@
       }
     },
     methods: {
+      removeHandler(index) {
+        this.createModel.thumb.splice(index, 1);
+      },
+      handleSuccess(res, file) {
+        if (res.code == 200) {
+          this.createModel.thumb.push(res.data);
+        }
+      },
       showModal() {
         this.$refs['create'].toggleShow();
       },
       okHandler() {
-        this.$refs['createForm'].submit();
+        this.$refs['form'].validate(valid => {
+          if (valid) {
+            this.submit(this.createModel);
+          }
+        });
       },
       submit(entity) {
         const params = JSON.parse(JSON.stringify(entity));
