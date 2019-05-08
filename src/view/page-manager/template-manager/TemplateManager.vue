@@ -23,20 +23,18 @@
     <ModalUtil ref="create" title="创建模板" :loading="loading" @reset="resetCreateData" @on-ok="okHandler">
       <!--<FormUtil ref="createForm" :label-width="100" :model="createModel" :rules="createRule" :comp="createComp" @on-submit="submit"></FormUtil>-->
       <Form ref="form" :model="createModel" :rules="createRule" :label-width="100">
-        <Form ref="form" :model="createModel" :rules="createRule" :label-width="100">
-          <FormItem label="标题">
-            <Input v-model="createModel.name"/>
-          </FormItem>
-          <FormItem label="展示图片">
-            <MyUpload
-              :upload-list="createModel.thumb"
-              @on-success="handleSuccess"
-              @on-remove="removeHandler"
-              :format="['jpg','jpeg','png','svg']"
-              type="drag"
-            />
-          </FormItem>
-        </Form>
+        <FormItem label="标题">
+          <Input v-model="createModel.name"/>
+        </FormItem>
+        <FormItem label="展示图片">
+          <MyUpload
+            :upload-list="createModel.thumb"
+            @on-success="handleSuccess"
+            @on-remove="removeHandler"
+            :format="['jpg','jpeg','png','svg']"
+            type="drag"
+          />
+        </FormItem>
       </Form>
     </ModalUtil>
   </Card>

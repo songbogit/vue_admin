@@ -59,6 +59,44 @@ export default [
     }
   },
   {
+    path: '/sys',
+    name: 'sys',
+    component: Main,
+    meta: {
+      title: '系统管理',
+      icon: 'ios-settings'
+    },
+    children: [
+      {
+        path: 'user-manager',
+        name: 'user-manager',
+        component: () => import('@/view/sys/sys-user/SysUser.vue'),
+        meta: {
+          title: '系统用户管理',
+          icon: 'ios-settings',
+        }
+      },
+      {
+        path: 'role-manager',
+        name: 'role-manager',
+        component: () => import('@/view/sys/sys-role/SysRole.vue'),
+        meta: {
+          title: '角色管理',
+          icon: 'ios-settings',
+        }
+      },
+      {
+        path: 'menu-manager',
+        name: 'menu-manager',
+        component: () => import('@/view/sys/sys-menu/SysMenu.vue'),
+        meta: {
+          title: '菜单管理',
+          icon: 'ios-settings',
+        }
+      },
+    ]
+  },
+  {
     path: '/material-manager',
     name: 'material-manager',
     component: Main,

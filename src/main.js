@@ -15,7 +15,8 @@ import './index.less'
 import './assets/css/common.less'
 import './assets/css/module.css'
 import '@/assets/icons/iconfont.css'
-import {postRequest} from 'libs/axios'
+import utils from "./libs/prototype";
+import globalMixins from './libs/mixins'
 // 实际打包时应该不引入mock
 /* eslint-disable */
 // if (process.env.NODE_ENV !== 'production') require('@/mock')
@@ -24,6 +25,16 @@ Vue.use(iView, {
   i18n: (key, value) => i18n.t(key, value)
 })
 Vue.use(VueDND)
+/**
+ * 全局 util 主要用于弹框、entity reset、manager-view
+ */
+Object.keys(utils).forEach(key => {
+  Vue.prototype[`$${key}`] = utils[key];
+});
+/**
+ * 全局mixin
+ */
+Vue.mixin(globalMixins);
 /**
  * @description 注册admin内置插件
  */
