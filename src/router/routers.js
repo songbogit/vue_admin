@@ -123,7 +123,7 @@ export default [
           icon: 'ios-settings',
           notCache: true
         },
-        component: () => import('@/view/material-manager/video-manager/VideoEidtor.vue')
+        component: () => import('@/view/material-manager/video-manager/VideoEditor.vue')
       },
       {
         path: 'video-group-manager',

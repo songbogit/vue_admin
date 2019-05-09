@@ -123,8 +123,8 @@
       getSearchData() {
         const params = Object.assign({}, this.searchData);
         if (!this.unPage) {
-          params.page = this.page.current - 1;
-          params.size = this.page.pageSize;
+          params.pageNum = this.page.current - 1;
+          params.pageSize = this.page.pageSize;
         }
         return params;
       },

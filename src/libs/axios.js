@@ -40,11 +40,7 @@ axios.interceptors.response.use(response => {
         break
       case 500:
         // 错误
-        if (data.message !== null) {
-          Message.error(data.message)
-        } else {
-          Message.error('未知错误')
-        }
+        Message.error(data.msg || '系统处理异常');
         break
       default:
         return data

@@ -5,6 +5,8 @@ import ModalUtil from '@/view/components/global-util/ModalUtil';
 import SearchItem from '@/view/components/global-util/SearchItem';
 import DateUtil from '@/view/components/global-util/DateUtil';
 import SpinUtil from '@/view/components/global-util/SpinUtil';
+import NewUpload from '@/view/components/global-util/NewUpload';
+import ImageView from '@/view/components/global-util/ImageView';
 
 const importDirective = Vue => {
   /**
@@ -22,6 +24,8 @@ const importDirective = Vue => {
   Vue.component('FormUtil', FormUtil);
   Vue.component('DateUtil', DateUtil);
   Vue.component('SpinUtil', SpinUtil);
-}
+  Vue.component('NewUpload', NewUpload);
+  Vue.component('ImageView', ImageView);
+};
 
 export default importDirective

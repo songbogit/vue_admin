@@ -2,15 +2,15 @@
   <Card>
     <Row>
       <Col span="24" class="mb-10">
-        <Button type="primary" class="mr-5" icon="md-add">添加子菜单</Button>
+        <Button type="primary" class="mr-5" icon="md-add" @click="addChild">添加子菜单</Button>
         <Button class="mr-5" icon="md-add" @click="addLevelOne">添加一级菜单</Button>
-        <Button class="mr-5" icon="md-trash">批量删除</Button>
-        <Button class="mr-5" icon="ios-refresh">刷新</Button>
+        <Button class="mr-5" icon="md-trash" @click="remove">批量删除</Button>
+        <Button class="mr-5" icon="ios-refresh" @click="get">刷新</Button>
       </Col>
       <Col span="6">
         <Alert show-icon>当前选择：</Alert>
         <!--<Input placeholder="请输入菜单名称搜索" clearable icon="md-search"/>-->
-        <Tree :data="menus" @on-select-change="selectChange" show-checkbox></Tree>
+        <Tree :data="menus" @on-select-change="selectChange" @on-check-change="checkChange" show-checkbox></Tree>
         <SpinUtil :show="loading"/>
       </Col>
       <Col span="10">
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-  import {permissionSave, permissionList} from "../../../api/sys";
+  import {permissionSave, permissionList, permissionDelete} from "../../../api/sys";
 
   export default {
     name: "SysMenu",
@@ -79,6 +79,7 @@
       return {
         loading: false,
         menus: [],
+        checked: [],
         changeEntity: {
           component: null,
           icon: null,
@@ -94,7 +95,8 @@
           path: null,
           name: null,
           sortOrder: null,
-          title: null
+          title: null,
+          parentId: null
         },
         rules: {
           name: [
@@ -121,9 +123,26 @@
         this.saveEntity.level = 1;
         this.toggle('modal', true);
       },
+      addChild() {
+        const {id, title} = this.changeEntity;
+        if (id) {
+          this.saveEntity.parentId = id;
+          this.saveEntity.parentName = title;
+          this.toggle('modal');
+        } else {
+          this.$Message.error('请选择父级菜单');
+        }
+      },
       save(flag) {
         const refName = flag ? 'save' : 'change';
         const entity = flag ? this.saveEntity : this.changeEntity;
+        if (!flag && !entity.id) {
+          this.$Message.error('请选择修改类目');
+          return;
+        }
+        if (flag) {
+          entity.id = 0;
+        }
         this.$refs[refName].validate(valid => {
           if (valid) {
             this.loading = true;
@@ -146,8 +165,26 @@
           }
         })
       },
+      remove() {
+        if (this.checked.length) {
+          this.$sure(() => {
+            this.loading = true;
+            permissionDelete(this.checked).then(res => {
+              this.loading = false;
+              if (res.code == 200) {
+                this.get();
+              }
+            })
+          })
+        } else {
+          this.$Message.warning('请选择删除项');
+        }
+      },
       selectChange(arr) {
         this.changeEntity = {...(arr[0] || {})};
+      },
+      checkChange(arr) {
+        this.checked = arr.map(item => item.id);
       },
       resetChangeEntity() {
         Object.assign(this.changeEntity, {
