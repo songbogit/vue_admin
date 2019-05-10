@@ -15,8 +15,7 @@ import parentView from '@/components/parent-view'
  *  beforeCloseName: (-) 设置该字段，则在关闭当前tab页时会去'@/router/before-close.js'里寻找该字段名对应的方法，作为关闭前的钩子函数
  * }
  */
-
-export default [
+export const basicRoutes = [
   {
     path: '/login',
     name: 'login',
@@ -49,178 +48,181 @@ export default [
       }
     ]
   },
-  {
-    path: '',
-    name: 'doc',
-    meta: {
-      title: '文档',
-      href: 'https://lison16.github.io/iview-admin-doc/#/',
-      icon: 'ios-book'
-    }
-  },
-  {
-    path: '/sys',
-    name: 'sys',
-    component: Main,
-    meta: {
-      title: '系统管理',
-      icon: 'ios-settings'
-    },
-    children: [
-      {
-        path: 'user-manager',
-        name: 'user-manager',
-        component: () => import('@/view/sys/sys-user/SysUser.vue'),
-        meta: {
-          title: '系统用户管理',
-          icon: 'ios-settings',
-        }
-      },
-      {
-        path: 'role-manager',
-        name: 'role-manager',
-        component: () => import('@/view/sys/sys-role/SysRole.vue'),
-        meta: {
-          title: '角色管理',
-          icon: 'ios-settings',
-        }
-      },
-      {
-        path: 'menu-manager',
-        name: 'menu-manager',
-        component: () => import('@/view/sys/sys-menu/SysMenu.vue'),
-        meta: {
-          title: '菜单管理',
-          icon: 'ios-settings',
-        }
-      },
-    ]
-  },
-  {
-    path: '/material-manager',
-    name: 'material-manager',
-    component: Main,
-    meta: {
-      title: '素材库管理',
-      icon: 'ios-settings'
-    },
-    children: [
-      {
-        path: 'video-manager',
-        name: 'video-manager',
-        meta: {
-          title: '视频管理',
-          icon: 'ios-settings',
-          // notCache: true
-        },
-        component: () => import('@/view/material-manager/video-manager/VideoManager.vue')
-      },
-      {
-        path: 'video-edit',
-        name: 'video-edit',
-        meta: {
-          title: '视频编目',
-          icon: 'ios-settings',
-          notCache: true
-        },
-        component: () => import('@/view/material-manager/video-manager/VideoEditor.vue')
-      },
-      {
-        path: 'video-group-manager',
-        name: 'video-group-manager',
-        meta: {
-          title: '视频集管理',
-          icon: 'ios-settings',
-          // notCache: true
-        },
-        component: () => import('@/view/material-manager/video-group-manager/VideogroupManager.vue')
-      },
-      {
-        path: 'video-group-edit',
-        name: 'video-group-edit',
-        meta: {
-          title: '视频集编目',
-          icon: 'ios-settings',
-          notCache: true
-        },
-        component: () => import('@/view/material-manager/video-group-manager/VideogroupEditor.vue')
-      },
-      {
-        path: 'video-group-choose',
-        name: 'video-group-choose',
-        meta: {
-          title: '视频集挑选',
-          icon: 'ios-settings',
-          // notCache: true
-        },
-        component: () => import('@/view/material-manager/video-group-manager/VideoChoose.vue')
-      }
-    ]
-  },
-  {
-    path: '/page-template',
-    name: 'page-template',
-    component: Main,
-    meta: {
-      title: '页面管理',
-      icon: 'ios-settings'
-    },
-    children: [
-      {
-        path: 'page-manager',
-        name: 'page-manager',
-        meta: {
-          title: '页面管理',
-          icon: 'ios-settings',
-          // notCache: true
-        },
-        component: () => import('@/view/page-manager/page-manager/PageManager.vue')
-      },
-      {
-        path: 'page-edit',
-        name: 'page-edit',
-        meta: {
-          title: '页面编辑',
-          icon: 'ios-settings',
-          // notCache: true,
-          hideInMenu: true
-        },
-        component: () => import('@/view/page-manager/page-manager/PageEditor.vue')
-      },
-      {
-        path: 'content-edit',
-        name: 'content-edit',
-        meta: {
-          title: '内容编辑',
-          icon: 'ios-settings',
-          // notCache: true,
-          hideInMenu: true
-        },
-        component: () => import('@/view/page-manager/page-manager/ContentEditor.vue')
-      },
-      {
-        path: 'template-manager',
-        name: 'template-manager',
-        meta: {
-          title: '模板管理',
-          icon: 'ios-settings',
-          // notCache: true
-        },
-        component: () => import('@/view/page-manager/template-manager/TemplateManager.vue')
-      },
-      {
-        path: 'template-edit',
-        name: 'template-edit',
-        meta: {
-          title: '模板编辑',
-          icon: 'ios-settings',
-          // notCache: true,
-          hideInMenu: true
-        },
-        component: () => import('@/view/page-manager/template-manager/TemplateEdit.vue')
-      }
-    ]
-  },
+];
+export default [
+  ...basicRoutes,
+  // {
+  //   path: '',
+  //   name: 'doc',
+  //   meta: {
+  //     title: '文档',
+  //     href: 'https://lison16.github.io/iview-admin-doc/#/',
+  //     icon: 'ios-book'
+  //   }
+  // },
+  // {
+  //   path: '/sys',
+  //   name: 'sys',
+  //   component: Main,
+  //   meta: {
+  //     title: '系统管理',
+  //     icon: 'ios-settings'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'user-manager',
+  //       name: 'user-manager',
+  //       component: () => import('@/view/sys/sys-user/SysUser.vue'),
+  //       meta: {
+  //         title: '系统用户管理',
+  //         icon: 'ios-settings',
+  //       }
+  //     },
+  //     {
+  //       path: 'role-manager',
+  //       name: 'role-manager',
+  //       component: () => import('@/view/sys/sys-role/SysRole.vue'),
+  //       meta: {
+  //         title: '角色管理',
+  //         icon: 'ios-settings',
+  //       }
+  //     },
+  //     {
+  //       path: 'menu-manager',
+  //       name: 'menu-manager',
+  //       component: () => import('@/view/sys/sys-menu/SysMenu.vue'),
+  //       meta: {
+  //         title: '菜单管理',
+  //         icon: 'ios-settings',
+  //       }
+  //     },
+  //   ]
+  // },
+  // {
+  //   path: '/material-manager',
+  //   name: 'material-manager',
+  //   component: Main,
+  //   meta: {
+  //     title: '素材库管理',
+  //     icon: 'ios-settings'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'video-manager',
+  //       name: 'video-manager',
+  //       meta: {
+  //         title: '视频管理',
+  //         icon: 'ios-settings',
+  //         // notCache: true
+  //       },
+  //       component: () => import('@/view/material-manager/video-manager/VideoManager.vue')
+  //     },
+  //     {
+  //       path: 'video-edit',
+  //       name: 'video-edit',
+  //       meta: {
+  //         title: '视频编目',
+  //         icon: 'ios-settings',
+  //         notCache: true
+  //       },
+  //       component: () => import('@/view/material-manager/video-manager/VideoEditor.vue')
+  //     },
+  //     {
+  //       path: 'video-group-manager',
+  //       name: 'video-group-manager',
+  //       meta: {
+  //         title: '视频集管理',
+  //         icon: 'ios-settings',
+  //         // notCache: true
+  //       },
+  //       component: () => import('@/view/material-manager/video-group-manager/VideogroupManager.vue')
+  //     },
+  //     {
+  //       path: 'video-group-edit',
+  //       name: 'video-group-edit',
+  //       meta: {
+  //         title: '视频集编目',
+  //         icon: 'ios-settings',
+  //         notCache: true
+  //       },
+  //       component: () => import('@/view/material-manager/video-group-manager/VideogroupEditor.vue')
+  //     },
+  //     {
+  //       path: 'video-group-choose',
+  //       name: 'video-group-choose',
+  //       meta: {
+  //         title: '视频集挑选',
+  //         icon: 'ios-settings',
+  //         // notCache: true
+  //       },
+  //       component: () => import('@/view/material-manager/video-group-manager/VideoChoose.vue')
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/page-template',
+  //   name: 'page-template',
+  //   component: Main,
+  //   meta: {
+  //     title: '页面管理',
+  //     icon: 'ios-settings'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'page-manager',
+  //       name: 'page-manager',
+  //       meta: {
+  //         title: '页面管理',
+  //         icon: 'ios-settings',
+  //         // notCache: true
+  //       },
+  //       component: () => import('@/view/page-manager/page-manager/PageManager.vue')
+  //     },
+  //     {
+  //       path: 'page-edit',
+  //       name: 'page-edit',
+  //       meta: {
+  //         title: '页面编辑',
+  //         icon: 'ios-settings',
+  //         // notCache: true,
+  //         hideInMenu: true
+  //       },
+  //       component: () => import('@/view/page-manager/page-manager/PageEditor.vue')
+  //     },
+  //     {
+  //       path: 'content-edit',
+  //       name: 'content-edit',
+  //       meta: {
+  //         title: '内容编辑',
+  //         icon: 'ios-settings',
+  //         // notCache: true,
+  //         hideInMenu: true
+  //       },
+  //       component: () => import('@/view/page-manager/page-manager/ContentEditor.vue')
+  //     },
+  //     {
+  //       path: 'template-manager',
+  //       name: 'template-manager',
+  //       meta: {
+  //         title: '模板管理',
+  //         icon: 'ios-settings',
+  //         // notCache: true
+  //       },
+  //       component: () => import('@/view/page-manager/template-manager/TemplateManager.vue')
+  //     },
+  //     {
+  //       path: 'template-edit',
+  //       name: 'template-edit',
+  //       meta: {
+  //         title: '模板编辑',
+  //         icon: 'ios-settings',
+  //         // notCache: true,
+  //         hideInMenu: true
+  //       },
+  //       component: () => import('@/view/page-manager/template-manager/TemplateEdit.vue')
+  //     }
+  //   ]
+  // },
   {
     path: '/401',
     name: 'error_401',
@@ -237,12 +239,4 @@ export default [
     },
     component: () => import('@/view/error-page/500.vue')
   },
-  {
-    path: '*',
-    name: 'error_404',
-    meta: {
-      hideInMenu: true
-    },
-    component: () => import('@/view/error-page/404.vue')
-  }
 ]

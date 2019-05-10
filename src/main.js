@@ -17,6 +17,7 @@ import './assets/css/module.css'
 import '@/assets/icons/iconfont.css'
 import utils from "./libs/prototype";
 import globalMixins from './libs/mixins'
+import {initRouter} from "./libs/util";
 // 实际打包时应该不引入mock
 /* eslint-disable */
 // if (process.env.NODE_ENV !== 'production') require('@/mock')
@@ -60,6 +61,6 @@ new Vue({
   store,
   render: h => h(App),
   mounted() {
-
+    initRouter(this);
   }
-})
+});

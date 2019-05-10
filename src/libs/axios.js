@@ -47,8 +47,11 @@ axios.interceptors.response.use(response => {
   }
   return data
 }, (err) => {
-  console.log('err')
-  console.log(err)
+  console.error(err.response)
+  if (err.response == undefined) {
+    logout();
+  }
+  return;
   // 返回状态码不为200时候的错误处理
   if (err.status == 302) {
     Message.error('登录失效');
@@ -56,7 +59,7 @@ axios.interceptors.response.use(response => {
   } else {
     Message.error(err.toString())
   }
-  return Promise.resolve(err)
+  return {}
 })
 
 export const getRequest = (url, params) => {

@@ -1,8 +1,10 @@
 import Cookies from 'js-cookie'
+import Main from '@/components/main'
 // cookie保存的天数
 import config from '@/config'
 import { forEach, hasOneOf, objEqual } from '@/libs/tools'
 import {userLogout} from "../api/user";
+import {getMenuList} from "../api/sys";
 
 export const TOKEN_KEY = 'userInfo'
 
@@ -347,4 +349,102 @@ export const localSave = (key, value) => {
 
 export const localRead = (key) => {
   return localStorage.getItem(key) || ''
+}
+
+export const initRouter = function (vm) {
+  const constRoutes = [];
+
+  // 404路由需要和动态路由一起注入
+  const otherRouter = [
+    {
+      path: '*',
+      name: 'error_404',
+      meta: {
+        hideInMenu: true
+      },
+      component: () => import('@/view/error-page/404.vue')
+    }
+  ];
+
+  // 判断用户是否登录
+  let userInfo = Cookies.get('userInfo')
+  if (userInfo === null || userInfo === "" || userInfo === undefined) {
+    // 未登录
+    return;
+  }
+  // 加载菜单
+  getMenuList().then(data => {
+    if (data.code == 200) {
+      let menuData = data.data || [];
+      if (menuData === null || menuData === "" || menuData === undefined) {
+        return;
+      }
+      initRouterNode(constRoutes, menuData);
+      // 添加主界面路由
+      vm.$store.commit('updateAppRouter', constRoutes);
+      // // 添加全局路由
+      // vm.$store.commit('updateDefaultRouter', otherRoutes);
+      // // 刷新界面菜单
+      // constRoutes.forEach(item => {
+      //   item.children = item.children.filter(item => !item.hideInMenu);
+      // });
+      // vm.$store.commit('updateMenulist', constRoutes.filter(item => item.children.length > 0));
+      //
+      // let tagsList = [];
+      // vm.$store.state.app.routers.map((item) => {
+      //   if (item.children.length < 1) {
+      //     tagsList.push(item.children[0]);
+      //   } else {
+      //     tagsList.push(...item.children);
+      //   }
+      // });
+      // vm.$store.commit('setTagsList', tagsList);
+    }
+  });
+};
+function lazyLoading(url) {
+  return () => import(`@/view/${url}.vue`);
+}
+// 生成路由节点
+function initRouterNode (routers, data) {
+  for (var item of data) {
+    let menu = Object.assign({}, item);
+    // menu.component = import(`@/views/${menu.component}.vue`);
+    menu.component = menu.component.indexOf('main') > -1 ? Main : lazyLoading(menu.component);
+    if (item.children && item.children.length > 0) {
+      menu.children = [];
+      initRouterNode(menu.children, item.children);
+    }
+
+    let meta = {};
+    // 给页面添加权限、标题、第三方网页链接
+    meta.permTypes = menu.permTypes ? menu.permTypes : null;
+    meta.title = menu.title ? menu.title : null;
+    meta.url = menu.url ? menu.url : null;
+    meta.hideInMenu = !!menu.hideInMenu;
+    meta.icon = item.icon;
+    menu.meta = meta;
+    routers.push(menu);
+  }
+}
+export const toDefaultPage = function (routers, name, route, next) {
+  let len = routers.length;
+  let i = 0;
+  let notHandle = true;
+  while (i < len) {
+    if (routers[i].name === name && routers[i].children && routers[i].redirect === undefined) {
+      route.replace({
+        name: routers[i].children[0].name
+      });
+      notHandle = false;
+      console.log(2222222222)
+      next();
+      break;
+    }
+    i++;
+  }
+  if (notHandle) {
+    console.log(11111111)
+    next();
+  }
 }

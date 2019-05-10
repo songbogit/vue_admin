@@ -31,7 +31,8 @@ export default {
         password: password
       }).then(res => {
         if (res.code == 200) {
-          setUserInfo(JSON.stringify(res.data));
+          setUserInfo(JSON.stringify(res.data.rbacUser));
+          window.location.reload();
           this.$router.push('/home');
         }
       }).catch(res => {

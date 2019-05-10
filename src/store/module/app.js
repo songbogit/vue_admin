@@ -32,13 +32,20 @@ export default {
     homeRoute: getHomeRoute(routers, homeName),
     local: localRead('local'),
     errorList: [],
-    hasReadErrorPage: false
+    hasReadErrorPage: false,
+    routers: routers
   },
   getters: {
-    menuList: (state, getters, rootState) => getMenuByRouter(routers, rootState.user.access),
+    menuList: (state, getters, rootState) => getMenuByRouter(state.routers, rootState.user.access),
     errorCount: state => state.errorList.length
   },
   mutations: {
+    // 动态添加主界面路由，需要缓存
+    updateAppRouter(state, routes) {
+      console.log('fuck')
+      state.routers.push(...routes);
+      router.addRoutes(routes);
+    },
     setBreadCrumb (state, route) {
       state.breadCrumbList = getBreadCrumbList(route, state.homeRoute)
     },

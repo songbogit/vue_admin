@@ -1,4 +1,6 @@
 import {getRequest, postRequest, postJson} from "../libs/axios";
+import {getUserInfo} from "../libs/util";
+
 /**
  * 菜单
  */
@@ -31,6 +33,10 @@ export const userList = (params) => {
 };
 export const userInfo = (params) => {
   return getRequest('/sys/user/getUserInfo', params);
+};
+export const getMenuList = () => {
+  let id = (getUserInfo() || {}).uid;
+  return getRequest('/sys/permission/getMenuListByUserId');
 };
 /**
  * 角色
