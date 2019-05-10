@@ -42,7 +42,6 @@ export default {
   mutations: {
     // 动态添加主界面路由，需要缓存
     updateAppRouter(state, routes) {
-      console.log('fuck')
       state.routers.push(...routes);
       router.addRoutes(routes);
     },

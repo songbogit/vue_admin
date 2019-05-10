@@ -139,7 +139,6 @@
                   class: classes,
                   on: {
                     click: () => {
-                      console.log(params.row)
                       const id = params.row.id;
                       this.$store.commit('setContentEditId', id);
                       localStorage.setItem('contentEditId', id);

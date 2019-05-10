@@ -47,7 +47,6 @@ axios.interceptors.response.use(response => {
   }
   return data
 }, (err) => {
-  console.error(err.response)
   if (err.response == undefined) {
     logout();
   }

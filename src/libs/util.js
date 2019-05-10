@@ -415,7 +415,6 @@ function initRouterNode (routers, data) {
       menu.children = [];
       initRouterNode(menu.children, item.children);
     }
-
     let meta = {};
     // 给页面添加权限、标题、第三方网页链接
     meta.permTypes = menu.permTypes ? menu.permTypes : null;
@@ -437,14 +436,12 @@ export const toDefaultPage = function (routers, name, route, next) {
         name: routers[i].children[0].name
       });
       notHandle = false;
-      console.log(2222222222)
       next();
       break;
     }
     i++;
   }
   if (notHandle) {
-    console.log(11111111)
     next();
   }
 }
