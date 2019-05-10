@@ -39,7 +39,7 @@ export const roleAdd = (params) => {
   return postJson('/sys/role/add', params);
 };
 export const roleDelete = (params) => {
-  return postRequest(`/sys/role/delByIds/${params.join(',')}`);
+  return postRequest(`/sys/role/delAllByIds/${params.join(',')}`);
 };
 export const roleEdit = (params) => {
   return postJson('/sys/role/edit', params);

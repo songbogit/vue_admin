@@ -34,6 +34,9 @@
           <FormItem label="前端组件路径：" prop="component">
             <Input v-model="changeEntity.component" clearable/>
           </FormItem>
+          <FormItem label="是否隐藏菜单：">
+            <Checkbox v-model="changeEntity.hideInMenu">隐藏</Checkbox>
+          </FormItem>
           <FormItem>
             <Button type="primary" icon="ios-create" class="mr-5" :loading="loading" @click="save(false)">修改并保存</Button>
             <Button @click="resetChangeEntity">重置数据</Button>
@@ -65,6 +68,9 @@
         <FormItem label="前端组件路径：" prop="component">
           <Input v-model="saveEntity.component" clearable/>
         </FormItem>
+        <FormItem label="是否隐藏菜单：">
+          <Checkbox v-model="saveEntity.hideInMenu">隐藏</Checkbox>
+        </FormItem>
       </Form>
     </ModalUtil>
   </Card>
@@ -86,7 +92,8 @@
           path: null,
           name: null,
           sortOrder: null,
-          title: null
+          title: null,
+          hideInMenu: false,
         },
         saveEntity: {
           parentName: '',
@@ -96,7 +103,8 @@
           name: null,
           sortOrder: null,
           title: null,
-          parentId: null
+          parentId: null,
+          hideInMenu: false
         },
         rules: {
           name: [

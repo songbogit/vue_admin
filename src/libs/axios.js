@@ -26,7 +26,6 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(response => {
   const data = response.data
   // 根据返回的code值来做不同的处理(和后端约定)
-
   if (data) {
     switch (data.code) {
       case 401:
@@ -48,6 +47,8 @@ axios.interceptors.response.use(response => {
   }
   return data
 }, (err) => {
+  console.log('err')
+  console.log(err)
   // 返回状态码不为200时候的错误处理
   if (err.status == 302) {
     Message.error('登录失效');
