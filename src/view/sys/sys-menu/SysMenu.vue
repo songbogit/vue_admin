@@ -8,7 +8,7 @@
         <Button class="mr-5" icon="ios-refresh" @click="get">刷新</Button>
       </Col>
       <Col span="6">
-        <Alert show-icon>当前选择：</Alert>
+        <Alert show-icon>当前选择：{{changeEntity.title}}</Alert>
         <!--<Input placeholder="请输入菜单名称搜索" clearable icon="md-search"/>-->
         <Tree :data="menus" @on-select-change="selectChange" @on-check-change="checkChange" show-checkbox></Tree>
         <SpinUtil :show="loading"/>
@@ -132,9 +132,10 @@
         this.toggle('modal', true);
       },
       addChild() {
-        const {id, title} = this.changeEntity;
+        const {id, title, level} = this.changeEntity;
         if (id) {
           this.saveEntity.parentId = id;
+          this.saveEntity.parentLevel = level;
           this.saveEntity.parentName = title;
           this.toggle('modal');
         } else {
@@ -150,6 +151,7 @@
         }
         if (flag) {
           entity.id = 0;
+          entity.level = entity.parentLevel + 1;
         }
         this.$refs[refName].validate(valid => {
           if (valid) {
