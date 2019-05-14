@@ -135,7 +135,7 @@
         const {id, title, level} = this.changeEntity;
         if (id) {
           this.saveEntity.parentId = id;
-          this.saveEntity.parentLevel = level;
+          this.saveEntity.level = this.changeEntity.level + 1;
           this.saveEntity.parentName = title;
           this.toggle('modal');
         } else {
@@ -151,7 +151,6 @@
         }
         if (flag) {
           entity.id = 0;
-          entity.level = entity.parentLevel + 1;
         }
         this.$refs[refName].validate(valid => {
           if (valid) {
