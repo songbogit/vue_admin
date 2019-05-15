@@ -130,7 +130,7 @@
                       const id = params.row.id;
                       this.$store.commit('setPageEditId', id);
                       localStorage.setItem('pageEditId', id);
-                      this.$router.push('/page-template/page-edit');
+                      this.$router.push('/page/page-edit');
                     }
                   }
                 }, '页面管理'),
@@ -142,7 +142,7 @@
                       const id = params.row.id;
                       this.$store.commit('setContentEditId', id);
                       localStorage.setItem('contentEditId', id);
-                      this.$router.push('/page-template/content-edit');
+                      this.$router.push('/page/content-edit');
                     }
                   }
                 }, '内容管理'),

@@ -146,7 +146,7 @@
       edit(id) {
         this.$store.commit('setTemplateEditId', id);
         localStorage.setItem('templateEditId', id);
-        this.$router.push('/page-template/template-edit');
+        this.$router.push('/page/template-edit');
       }
     },
     created() {

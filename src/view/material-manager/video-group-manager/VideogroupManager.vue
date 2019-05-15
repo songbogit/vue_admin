@@ -160,7 +160,7 @@
       },
       addVideoSet(id = '') {
         this.$store.commit('setVideoSetEditId', id);
-        this.$router.push('/material-manager/video-group-edit');
+        this.$router.push('/material/video-group-edit');
       },
       managerSuccess(type, data) {
 

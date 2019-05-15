@@ -278,7 +278,7 @@
         handler(params).then(res => {
           this.showSpin = false;
           if (res.code == 200) {
-            this.$router.push('/material-manager/video-manager');
+            this.$router.push('/material/video-manager');
           }
         }).catch(res => {
           this.showSpin = false;

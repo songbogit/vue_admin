@@ -157,7 +157,7 @@
       },
       addVideo(id = '') {
         this.$store.commit('setVideoEditId', id);
-        this.$router.push('/material-manager/video-edit');
+        this.$router.push('/material/video-edit');
       }
     },
     provide() {
