@@ -453,7 +453,7 @@
           {compName: 'RadioGroup', label: '浏览权限：', value: 'permission', list: [{label: '所有用户', value: 0}, {label: '仅限会员', value: 1}]},
           {compName: 'RadioGroup', label: '内容状态：', value: 'is_draft', list: [{label: '发布', value: 0}, {label: '草稿', value: 1}]},
         ],
-        collapse: '1',
+        collapse: ['1'],
         contents: [], // 模块的内容
         keyWords: [], // 模块关键字
         allContents: [], // 查询到的内容
@@ -671,13 +671,10 @@
           this.showSpin = false;
           if (res.code == 200) {
             const data = res.data;
-            if ((data.ConfigsList || []).length > 0) {
-              // this.collapse = '1';
-              // setTimeout(() => {
-              //   this.$refs['pbtn0'].handleClickLink();
-              // }, 2000)
-            }
             this.layouts = data.ConfigsList || [];
+            if ((data.ConfigsList || []).length > 0) {
+              this.collapse.splice(0, 1, '1');
+            }
           }
         }).catch(res => {
           this.showSpin = false

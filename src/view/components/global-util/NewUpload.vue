@@ -73,10 +73,6 @@ export default {
         return []
       }
     },
-    multiple: {
-      type: Boolean,
-      default: false
-    },
     maxLength: {
       type: Number,
       default: null
@@ -121,14 +117,14 @@ export default {
   computed: {
     fileList: {
       get () {
-        if (this.value) {
-          this.uploadList.push(this.value);
-        }
-        return this.uploadList;
+        return Array.isArray(this.value) ? this.value : !!this.value ? [this.value] : [];
       },
       set (newVal) {
 
       }
+    },
+    multiple() {
+      return Array.isArray(this.value);
     }
   },
   methods: {
@@ -139,22 +135,18 @@ export default {
     handleRemove (index) {
       if (!this.multiple) {
         this.$emit('input', null);
-        this.uploadList.splice(index, 1);
       } else {
-        if (this.showList) {
-          this.uploadList.splice(index, 1);
-        } else {
-          this.$emit('on-remove', this.index, index)
-        }
+        this.value.splice(index, 1);
       }
+      this.$emit('on-remove', index, this.index);
     },
     handleSuccess (res, file) {
       if (this.multiple) {
-        this.$emit('on-success', res, file, this.index)
+        this.value.push(res.data);
       } else {
         this.$emit('input', res.data);
       }
-      this.$emit('on-success', res.data);
+      this.$emit('on-success', res.data, file, this.index)
     },
     handleFormatError (file) {
       const _this = this
