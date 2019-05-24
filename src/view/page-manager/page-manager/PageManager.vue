@@ -50,7 +50,7 @@
   import {pageList, addPage, pageTemplateList} from "../../../api/page_template";
 
   export default {
-    name: "page-manager",
+    name: "PageManager",
     data() {
       return {
         loading: false,

@@ -46,7 +46,7 @@
   import MyUpload from '@/view/components/global-util/MyUpload';
 
   export default {
-    name: "template-manager",
+    name: "TemplateManager",
     components: {
       MyUpload
     },

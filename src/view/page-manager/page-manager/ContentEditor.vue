@@ -237,7 +237,7 @@
   import MyUpload from '@/view/components/global-util/MyUpload';
 
   export default {
-    name: "content-edit",
+    name: "ContentEdit",
     components: {
       MyUpload
     },

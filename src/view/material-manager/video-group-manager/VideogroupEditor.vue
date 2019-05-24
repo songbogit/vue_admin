@@ -83,7 +83,7 @@
   import MyUpload from './../../components/global-util/MyUpload';
 
   export default {
-    name: "video-group-edit",
+    name: "VideoGroupEditor",
     components: {
       MyUpload
     },

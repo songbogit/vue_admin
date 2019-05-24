@@ -133,7 +133,7 @@
   import MyUpload from './../../components/global-util/MyUpload';
 
   export default {
-    name: "video-edit",
+    name: "VideoEdit",
     components: {
       MyUpload
     },

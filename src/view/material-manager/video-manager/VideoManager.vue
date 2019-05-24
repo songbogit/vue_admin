@@ -20,7 +20,7 @@
   import {getVideoList, getVideoList2} from "../../../api/material";
 
   export default {
-    name: "video-manager",
+    name: "VideoManager",
     data() {
       return {
         save: {

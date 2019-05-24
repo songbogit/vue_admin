@@ -199,7 +199,7 @@
   import {getPageDetail, getAllBlock, insertPageBlock, sortPageBlock, deletePageBlock, getPageBlockDetail, updatePage, updatePageBlock} from "../../../api/page_template";
 
   export default {
-    name: "page-edit",
+    name: "PageEdit",
     components: {
       ContextMenu,
       MyUpload

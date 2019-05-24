@@ -29,7 +29,7 @@
   import {getVideoSetList} from "../../../api/material";
 
   export default {
-    name: "video-group-manager",
+    name: "VideoGroupManager",
     data() {
       return {
         save: {
