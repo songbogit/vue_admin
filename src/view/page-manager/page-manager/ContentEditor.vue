@@ -72,8 +72,8 @@
                     </Col>
                     <Col span="12">
                       <div class="clear mt-10 mb-10 relative">
-                        <img :src="imgBaseUrl + content.image" class="left block h60 w100 img-col">\
-                        <div class="left ml-10 content-col">
+                        <img :src="imgBaseUrl + content.image" class="left block h60 w100 img-col">
+                        <div class="left ml-10 content-col" style="width: 100%;">
                           <p class="bold fs14 line mb-5">{{content.title}}</p>
                           <p class="cl-dec mb-5 line2">{{content.description}}</p>
                           <div>
@@ -117,7 +117,7 @@
                     </Col>
                     <Col span="12">
                       <div class="clear mt-10 mb-10 relative">
-                        <img :src="imgBaseUrl + keyword.image" class="left block h60 w100 img-col">\
+                        <img :src="imgBaseUrl + keyword.image" class="left block h60 w100 img-col">
                         <div class="left ml-10 content-col">
                           <p class="bold fs14 line mb-5">{{keyword.title}}</p>
                           <p class="cl-dec mb-5 line2">{{keyword.description}}</p>
@@ -637,13 +637,15 @@
       },
       // 创建内容
       okHandler() {
-        this.$refs['form'].validate(valid => {
-          if (valid) {
-            this.createSubmit(this.createModel);
-          }
-        })
+        // this.$refs['form'].validate(valid => {
+        //   if (valid) {
+        //     this.createSubmit(this.createModel);
+        //   }
+        // })
+        this.createSubmit(this.createModel);
       },
       createSubmit(entity) {
+        console.log(entity)
         const params = JSON.parse(JSON.stringify(entity));
         params.image = params.image[0] || '';
         params.image_cdn = params.image;
