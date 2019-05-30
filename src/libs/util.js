@@ -352,7 +352,16 @@ export const localRead = (key) => {
 }
 
 export const initRouter = function (vm) {
-  const constRoutes = [];
+  const constRoutes = [
+    {
+      path: '*',
+      name: 'error_404',
+      meta: {
+        hideInMenu: true
+      },
+      component: () => import('@/view/error-page/404.vue')
+    }
+  ];
 
   // 404路由需要和动态路由一起注入
   const otherRouter = [
@@ -376,29 +385,16 @@ export const initRouter = function (vm) {
   getMenuList().then(data => {
     if (data.code == 200) {
       let menuData = data.data || [];
-      if (menuData === null || menuData === "" || menuData === undefined) {
-        return;
-      }
+      // if (menuData === null || menuData === "" || menuData === undefined) {
+      //   return;
+      // }
       initRouterNode(constRoutes, menuData);
       // 添加主界面路由
       vm.$store.commit('updateAppRouter', constRoutes);
-      // // 添加全局路由
-      // vm.$store.commit('updateDefaultRouter', otherRoutes);
-      // // 刷新界面菜单
-      // constRoutes.forEach(item => {
-      //   item.children = item.children.filter(item => !item.hideInMenu);
-      // });
-      // vm.$store.commit('updateMenulist', constRoutes.filter(item => item.children.length > 0));
-      //
-      // let tagsList = [];
-      // vm.$store.state.app.routers.map((item) => {
-      //   if (item.children.length < 1) {
-      //     tagsList.push(item.children[0]);
-      //   } else {
-      //     tagsList.push(...item.children);
-      //   }
-      // });
-      // vm.$store.commit('setTagsList', tagsList);
+    } else {
+      // initRouterNode(constRoutes, []);
+      // 添加主界面路由
+      vm.$store.commit('updateAppRouter', constRoutes);
     }
   });
 };

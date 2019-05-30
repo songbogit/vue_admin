@@ -50,7 +50,6 @@ axios.interceptors.response.use(response => {
   if (err.response == undefined) {
     logout();
   }
-  return;
   // 返回状态码不为200时候的错误处理
   if (err.status == 302) {
     Message.error('登录失效');
