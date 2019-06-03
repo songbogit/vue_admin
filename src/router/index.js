@@ -20,7 +20,7 @@ const turnTo = (to, access, next) => {
 }
 
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title;
+  document.title = to.meta.title || '';
   iView.LoadingBar.start()
   const token = getUserInfo()
   if (!token && to.name !== LOGIN_PAGE_NAME) {
