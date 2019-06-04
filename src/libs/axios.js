@@ -28,7 +28,7 @@ axios.interceptors.response.use(response => {
   // 根据返回的code值来做不同的处理(和后端约定)
   if (data) {
     switch (data.code) {
-      case 401:
+      case 302:
         Message.error('未登录');
         // 未登录 清除已登录状态
         logout();
